@@ -2,8 +2,9 @@
 An attempt at implementing AMS preconditioning within LibMesh 
 
 # Aims
-..Implement the AMS Hypre 
-
+..Implement the AMS-prconditioner from Hypre 
+..Implement the G-Discrete gradient operator in LibMesh
+..
 
 
 # Problems with LibMesh
@@ -14,8 +15,12 @@ faces, edges and volumes. It instead stores them relative to mappings
 of nodes. Which means to gain topological information about these
 sub-entities on-the-fly calculation has to be carried out to gain access to
 it.
-using 
-and more exotic elements such as Nedlec, Raviart thomas, mixed-elements
+
+
+Exotic elements such as Nedlec, Raviart thomas, mixed-elements
 which explicitly solve for values at these sub-entities cannot store 
-information easily. And this is even harder
-Some examples use lagrange multipliers and 
+information easily. This problem can be resolved partially 
+by using lagrange multipliers to represent the sub-entities and adding
+additional equations, however when it comes to coarsening of the sub-entity spaces
+
+
