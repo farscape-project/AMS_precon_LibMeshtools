@@ -38,8 +38,8 @@ class EdgeMap
 {
   private:
     // A map containing all the element edges
-	// and mapping them to a pair of nodes (the
-	// endpoints of the edge)
+    // and mapping them to a pair of nodes (the
+    // endpoints of the edge)
     std::map<int,std::pair<unsigned int, unsigned int>> edge_map;
 
     // Iterator for the edge-map
@@ -50,13 +50,17 @@ class EdgeMap
 
   public:
     // Gives every element edge a unique ID (however
-	// misleadingly the edges may share node-pairs thus
-	// are not truly unique in the global sense)
+    // misleadingly the edges may share node-pairs thus
+    // are not truly unique in the global sense)
     void Make_Unique_Global_Edges(EquationSystems & es, const std::string & system_name);
 
 
-    // Finds the G-operator using a 
+    // Finds the necessary information needed to caculate
+    // the G-operator matrix
     void Find_G_Operator();
+
+    // Sets the G-operator matrix using the PETSc-hypre 
+    // interface
     void Set_G_Operator();
 }
 
