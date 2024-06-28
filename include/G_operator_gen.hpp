@@ -49,10 +49,10 @@ class EdgeMap
     unsigned int ntot_edges_local = 0;  
 
   public:
-    // Gives every element edge a unique ID (however
+    // Gives every local element edge a unique ID (however
     // misleadingly the edges may share node-pairs thus
     // are not truly unique in the global sense)
-    void Make_Unique_Global_Edges(EquationSystems & es, const std::string & system_name);
+    void Make_Unique_local_Edges(EquationSystems & es, const std::string & system_name);
 
 
     // Finds the necessary information needed to caculate

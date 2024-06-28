@@ -5,7 +5,7 @@
 
 
 
-void EdgeMap::Make_Unique_Global_Edges(EquationSystems & es, const std::string & system_name)
+void EdgeMap::Make_Unique_local_Edges(EquationSystems & es, const std::string & system_name)
 {
   // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
   libmesh_ignore(es, system_name);
