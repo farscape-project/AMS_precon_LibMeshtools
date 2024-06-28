@@ -37,12 +37,25 @@
 class EdgeMap
 {
   private:
+    // A map containing all the element edges
+	// and mapping them to a pair of nodes (the
+	// endpoints of the edge)
     std::map<int,std::pair<unsigned int, unsigned int>> edge_map;
+
+    // Iterator for the edge-map
     std::map<int,std::pair<unsigned int, unsigned int>>::iterator it;
-    unsigned int ntot_edges = 0;  
+
+    // Total number of local edges
+    unsigned int ntot_edges_local = 0;  
 
   public:
+    // Gives every element edge a unique ID (however
+	// misleadingly the edges may share node-pairs thus
+	// are not truly unique in the global sense)
     void Make_Unique_Global_Edges(EquationSystems & es, const std::string & system_name);
+
+
+    // Finds the G-operator using a 
     void Find_G_Operator();
     void Set_G_Operator();
 }
