@@ -35,15 +35,8 @@ void EdgeMap::Make_Unique_local_Edges(EquationSystems & es, const std::string & 
       std::pair<unsigned int, unsigned int> edge_key;
       if(m < n) edge_key = make_pair(m,n);
       if(n < m) edge_key = make_pair(n,m);
-
-      //Check whether the edge key exists within the
-	  //edge-map
-      if(edge_map.find(edge_key) == edge_map.end()){
-        //If it does not exist add it to the end
-		//otherwise do nothing
-        edge_map[edge_key]= ntot_edges; //Naieve numbering (needs updating)
-        ntot_edges++;
-	  }
+      edge_map[ntot_edges]= edge_key;
+      ntot_edges++;
     }
   }
 
