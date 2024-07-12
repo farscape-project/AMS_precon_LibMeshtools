@@ -35,8 +35,8 @@ void EdgeMap::Make_Unique_local_Edges(EquationSystems & es, const std::string & 
       std::pair<unsigned int, unsigned int> edge_key;
       if(m < n) edge_key = make_pair(m,n);
       if(n < m) edge_key = make_pair(n,m);
-      edge_map[ntot_edges]= edge_key;
-      ntot_edges++;
+      edge_map[ntot_edges_local]= edge_key;
+      ntot_edges_local++;
     }
   }
 
@@ -44,6 +44,8 @@ void EdgeMap::Make_Unique_local_Edges(EquationSystems & es, const std::string & 
   //=====
   // Find the global number of edges 
   //=====
+  ntot_edges_local;
+  ntot_edges_global = 0;
 
 
   //=====
@@ -55,14 +57,30 @@ void EdgeMap::Make_Unique_local_Edges(EquationSystems & es, const std::string & 
 
 
 void EdgeMap::Find_G_Operator(){
-  int k = 0;
   for (it = edge_map.begin(); it != edge_map.end(); it++)
   {
-    k++;
-    std::cout << (it->first).first;
-              << it->second   // string's value 
-              << std::endl;
-}
+    unsigned int k = it->first;           // Local Edge number
+    unsigned int m = (it->second).first;  // first  edge node (global numbering)
+    unsigned int n = (it->second).second; // second edge node (global numbering)
+    unsigned int l = local_to_global_edge(k); //Global Edge number
 
 
+    //Calculate the local and global number of rows and columns
+    
+
+    
+  }
+};
+
+
+// Sets the G-operator matrix using the PETSc-hypre 
+// interface
+void EdgeMap::Set_G_Operator(){
+  for(unsigned int I=0; I<ntot_edges_local; I++){
+    unsigned int K = edge_map[I].first;
+    unsigned int L = edge_map[I].second;
+
+
+
+  }
 };
