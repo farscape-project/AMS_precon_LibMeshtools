@@ -54,29 +54,15 @@ class EdgeMap
     //Hypre matrix objects
     HYPRE_ParCSRMatrix par_G;
 
-   HYPRE_SStructGrid     edge_grid;
-   HYPRE_SStructGraph    A_graph;
-   HYPRE_SStructMatrix   A;
-   HYPRE_SStructVector   b;
-   HYPRE_SStructVector   x;
-   HYPRE_SStructGrid     node_grid;
-   HYPRE_SStructGraph    G_graph;
-   HYPRE_SStructStencil  G_stencil[3];
-   HYPRE_SStructMatrix   G;
-   HYPRE_SStructVector   xcoord, ycoord, zcoord;
-
-   HYPRE_Solver          solver, precond;
-
 
     //Function that takes the local edge number
     //and makes it global
     unsigned int local_to_global_edge(unsigned int local_edge);
 
   public:
-    // Gives every local element edge a unique ID (however
-    // misleadingly the edges may share node-pairs thus
-    // are not truly unique in the global sense)
-    void Make_Unique_local_Edges(EquationSystems & es, const std::string & system_name);
+    // Makes the edge map and calculates number
+    // of local and global edges (these are non-unique)
+    void Make_Edge_Map(EquationSystems & es, const std::string & system_name);
 
 
     // Finds the necessary information needed to caculate

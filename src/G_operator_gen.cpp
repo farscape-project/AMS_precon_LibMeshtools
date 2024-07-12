@@ -5,7 +5,7 @@
 
 
 
-void EdgeMap::Make_Unique_local_Edges(EquationSystems & es, const std::string & system_name)
+void EdgeMap::Make_Edge_Map(EquationSystems & es, const std::string & system_name)
 {
   // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
   libmesh_ignore(es, system_name);
@@ -40,17 +40,11 @@ void EdgeMap::Make_Unique_local_Edges(EquationSystems & es, const std::string & 
     }
   }
 
-
   //=====
   // Find the global number of edges 
   //=====
   ntot_edges_local;
   ntot_edges_global = 0;
-
-
-  //=====
-  // Update the edge numbers
-  //=====
 }
 
 
