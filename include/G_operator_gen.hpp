@@ -30,6 +30,7 @@
 #include <vector>
 #include <pair>
 #include <map>
+#include <mpi.h>
 
 //
 // Non-unique edges version
@@ -52,6 +53,7 @@ class EdgeMap
     unsigned int ntot_edges_global = 0;  
 
     //Hypre matrix objects
+    HYPRE_IJMatrix     par_G_ij;
     HYPRE_ParCSRMatrix par_G;
 
 
