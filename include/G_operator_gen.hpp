@@ -55,6 +55,8 @@ class EdgeMap
     //Hypre matrix objects
     HYPRE_IJMatrix     par_G_ij;
     HYPRE_ParCSRMatrix par_G;
+    unsigned int ilower, iupper; //Edge lower and upper bounds
+    unsigned int jlower, jupper; //Node lower and upper bounds
 
 
     //Function that takes the local edge number
