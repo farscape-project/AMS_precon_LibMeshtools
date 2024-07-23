@@ -73,7 +73,7 @@ void EdgeMap::Size_G_Operator(){
 
   //=====
   // Find the ilower and iupper
-  // (Edge bounds)
+  // (local Edge bounds)
   //=====
   ilower = 0;
   for(int I=0; I<procID; I++) ilower = ilower + ProcEdgeSize[I];
@@ -85,10 +85,29 @@ void EdgeMap::Size_G_Operator(){
   //=====
   // Find the minimum and maximum global
   // node numbers of local process
+  // (This is a wasteful search however
+  // its only done once)
   //=====
+  //declare and initialise the nodeIDS
+  unsigned int minLNodeID, maxLNodeID;
+  maxLNodeID = 0;
+  minLNodeID = edge_map[0].first;
   for(it = edge_map.begin(); it != edge_map.end(); it++){
-    Set 
+    //Check nodes in edges and find max
+    maxLNodeID = std::max(maxLNodeID,it.first);
+    maxLNodeID = std::max(maxLNodeID,it.second);
+
+    //Check nodes in edges and find min
+    minLNodeID = std::min(minLNodeID,it.first);
+    minLNodeID = std::min(minLNodeID,it.second);
   }
+
+  //=====
+  // Find the jlower and jupper
+  // (local node bounds)
+  //=====
+  jlower = minLNodeID;
+  jupper = maxLNodeID;
 };
 
 
@@ -97,11 +116,10 @@ void EdgeMap::Size_G_Operator(){
 // interface using the IJ matrix interface
 void EdgeMap::Set_G_Operator(){
 
-  for(unsigned int I=0; I<ntot_edges_local; I++){
-    unsigned int K = edge_map[I].first;
-    unsigned int L = edge_map[I].second;
-  }
-
+//  for(unsigned int I=0; I<ntot_edges_local; I++){
+ //   unsigned int K = edge_map[I].first;
+ //   unsigned int L = edge_map[I].second;
+//  }
 
   HYPRE_IJMatrixCreate(comm, ilower, iupper, jlower, jupper, &par_G_ij);
 };
