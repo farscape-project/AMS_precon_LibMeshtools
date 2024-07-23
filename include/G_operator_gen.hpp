@@ -35,7 +35,7 @@
 //
 // Non-unique edges version
 //
-class EdgeMap
+class G_operator
 {
   private:
     // A map containing all the element edges
@@ -68,7 +68,6 @@ class EdgeMap
     //and makes it global
     unsigned int local_to_global_edge(unsigned int local_edge);
 
-  public:
     // Makes the edge map and calculates number
     // of local and global edges (these are non-unique)
     void Make_Edge_Map(EquationSystems & es, const std::string & system_name);
@@ -80,5 +79,9 @@ class EdgeMap
     // Sets the G-operator matrix using the PETSc-hypre 
     // interface
     void Set_G_Operator();
+
+
+  public:
+    G_operator(EquationSystems & es, const std::string & system_name);
 }
 

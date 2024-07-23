@@ -2,9 +2,8 @@
 
 #include "G_operator_gen.hpp"
 
-// Makes the edge map and calculates number
-// of local and global edges (these are non-unique)
-void EdgeMap::Make_Edge_Map(EquationSystems & es, const std::string & system_name)
+// Makes the edge map (these are non-unique)
+void G_operator::Make_Edge_Map(EquationSystems & es, const std::string & system_name)
 {
   // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
   libmesh_ignore(es, system_name);
@@ -43,7 +42,7 @@ void EdgeMap::Make_Edge_Map(EquationSystems & es, const std::string & system_nam
 
 // Sizes up the G-operator matrix for the PETSc-hypre 
 // interface
-void EdgeMap::Size_G_Operator(){
+void G_operator::Size_G_Operator(){
   //=====
   // Get the MPI jobsize
   //=====
@@ -112,7 +111,7 @@ void EdgeMap::Size_G_Operator(){
 
 // Sets the G-operator matrix using the PETSc-hypre 
 // interface using the IJ matrix interface
-void EdgeMap::Set_G_Operator(){
+void G_operator::Set_G_Operator(){
   int nrows;
   int *ncols, *rows, *cols;
   double *values;
