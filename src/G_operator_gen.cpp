@@ -70,6 +70,14 @@ void EdgeMap::Size_G_Operator(){
   ntot_edges_global = 0; //Just making sure its zero;
   for(int I=0; I<nprocs; i++) ntot_edges_global = ntot_edges_global + ProcEdgeSize[I];
 
+  //=====
+  // Find the ilower and iupper
+  // (Edge bounds)
+  //=====
+  ilower = 0;
+  for(int I=0; I<procID; I++) ilower = ilower + ProcEdgeSize[I];
+  iupper = ilower + ProcEdgeSize[procID];
+  ilower = ilower + 1;
 //===================================================================
 //===================================================================
 
