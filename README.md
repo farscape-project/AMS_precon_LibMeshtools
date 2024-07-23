@@ -4,7 +4,7 @@ An attempt at implementing AMS preconditioning within LibMesh
 # Aims
 Implement the AMS-preconditioner from Hypre:
  - Implement the G-Discrete gradient operator in LibMesh
- - Implement a test case for comparison (curl-curl problem
+ - Implement a test case for comparison (curl-curl problem)
 
 
 # Problems with LibMesh
