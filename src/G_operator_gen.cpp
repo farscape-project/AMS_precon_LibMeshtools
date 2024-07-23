@@ -124,17 +124,17 @@ void EdgeMap::Set_G_Operator(){
   int *ncols, *rows, *cols;
   double *values;
 
-
   nrows  =  ProcEdgeSize[procID]
   ncols  = new int[nrows];
   rows   = new int[nrows];
 
-  for(int I=0; I<; I++){
+  //There are only two entries per row
+  //so no advanced calculations are really
+  //needed for this
+  cols   = new int[2*nrows]; 
+  values = new double[2*nrows];
 
-  }
-
-  cols   = new int[]; 
-  values = new double[];
+  //Set the values from the edge-map
 
 
   HYPRE_IJMatrixCreate(comm, ilower, iupper, jlower, jupper, &par_G_ij);
@@ -146,4 +146,6 @@ void EdgeMap::Set_G_Operator(){
 
   HYPRE_IJMatrixAssemble(par_G_ij);
   HYPRE_IJMatrixGetObject(par_G_ij, (void **) &par_G);
+
+  delete[] ncols, rows, cols, values;
 };
