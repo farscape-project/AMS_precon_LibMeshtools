@@ -128,15 +128,30 @@ void EdgeMap::Set_G_Operator(){
   ncols  = new int[nrows];
   rows   = new int[nrows];
 
+  //=====
   //There are only two entries per row
   //so no advanced calculations are really
   //needed for this
+  //=====
   cols   = new int[2*nrows]; 
   values = new double[2*nrows];
 
+  //=====
   //Set the values from the edge-map
+  //=====
+  int K=0;
+  for(it = edge_map.begin(); it != edge_map.end(); it++){
+    cols[K] = it.first;
+	values[K] =  1.0;
+    K++;
+    cols[K] = it.second;
+	values[K] = -1.0;
+    K++;
+  }
 
-
+  //=====
+  //Generate the matrix
+  //=====
   HYPRE_IJMatrixCreate(comm, ilower, iupper, jlower, jupper, &par_G_ij);
   HYPRE_IJMatrixSetObjectType(par_G_ij, HYPRE_PARCSR);
   HYPRE_IJMatrixInitialize(par_G_ij);
