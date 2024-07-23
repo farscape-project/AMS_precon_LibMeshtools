@@ -52,9 +52,10 @@ void EdgeMap::Size_G_Operator(){
 
 
 //===================================================================
-// This is an extremely wasteful procedure however i am using it for
-// as realistically I am not dealing with exascale (yet) an even then
-// an int array is not too bad
+// This is an extremely wasteful procedure (stores and nproc size 
+// array on every process) however i am using it as realistically 
+// I am not dealing with exascale (yet) an even then an int array
+// is not too bad
 //===================================================================
   //=====
   // Set the edge size
