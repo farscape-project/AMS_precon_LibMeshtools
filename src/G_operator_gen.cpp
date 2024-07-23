@@ -1,6 +1,12 @@
-
-
 #include "G_operator_gen.hpp"
+
+//The class constructor
+G_operator::G_operator(EquationSystems & es, const std::string & system_name){
+  Make_Edge_Map(es, system_name);
+  Size_G_Operator();
+  Set_G_Operator();
+};
+
 
 // Makes the edge map (these are non-unique)
 void G_operator::Make_Edge_Map(EquationSystems & es, const std::string & system_name)
