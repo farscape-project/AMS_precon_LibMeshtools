@@ -111,7 +111,6 @@ void EdgeMap::Size_G_Operator(){
 };
 
 
-
 // Sets the G-operator matrix using the PETSc-hypre 
 // interface using the IJ matrix interface
 void EdgeMap::Set_G_Operator(){
@@ -121,5 +120,28 @@ void EdgeMap::Set_G_Operator(){
  //   unsigned int L = edge_map[I].second;
 //  }
 
-  HYPRE_IJMatrixCreate(comm, ilower, iupper, jlower, jupper, &par_G_ij);
+
+/*
+MPI_Comm            comm;
+int                 nrows;
+int                *ncols;
+int                *rows;
+int                *cols;
+double             *values;
+*/
+
+HYPRE_IJMatrixCreate(comm, ilower, iupper, jlower, jupper, &par_G_ij);
+HYPRE_IJMatrixSetObjectType(par_G_ij, HYPRE_PARCSR);
+HYPRE_IJMatrixInitialize(par_G_ij);
+
+
+/* set matrix coefficients */
+HYPRE_IJMatrixSetValues(par_G_ij, nrows, ncols, rows, cols, values);
+
+/* add-to matrix cofficients, if desired */
+HYPRE_IJMatrixAddToValues(par_G_ij, nrows, ncols, rows, cols, values);
+
+HYPRE_IJMatrixAssemble(par_G_ij);
+HYPRE_IJMatrixGetObject(par_G_ij, (void **) &parcsr_matrix);
+
 };
