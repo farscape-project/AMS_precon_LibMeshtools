@@ -78,7 +78,6 @@ void EdgeMap::Size_G_Operator(){
   ilower = 0;
   for(int I=0; I<procID; I++) ilower = ilower + ProcEdgeSize[I];
   iupper = ilower + ProcEdgeSize[procID];
-  ilower = ilower + 1;
 //===================================================================
 //===================================================================
 
@@ -114,31 +113,31 @@ void EdgeMap::Size_G_Operator(){
 // Sets the G-operator matrix using the PETSc-hypre 
 // interface using the IJ matrix interface
 void EdgeMap::Set_G_Operator(){
-//  for(unsigned int I=0; I<ntot_edges_local; I++){
- //   unsigned int K = edge_map[I].first;
- //   unsigned int L = edge_map[I].second;
-//  }
-
 //MPI_Comm            comm;
   int nrows;
   int *ncols, *rows, *cols;
   double *values;
 
+  //=====
+  //Set the sizing aray values
+  //=====
   nrows  =  ProcEdgeSize[procID]
   ncols  = new int[nrows];
   rows   = new int[nrows];
+  for(int I=0; I<nrows; I++){
+    ncols[I] = 2;
+    row[I] = I + ilower;
+  }
 
   //=====
-  //There are only two entries per row
-  //so no advanced calculations are really
-  //needed for this
+  //Set the matrix values and the 
+  // from the edge-map
   //=====
+  //(There are only two entries per row
+  //so no advanced calculations are really
+  //needed for this)
   cols   = new int[2*nrows]; 
   values = new double[2*nrows];
-
-  //=====
-  //Set the values from the edge-map
-  //=====
   int K=0;
   for(it = edge_map.begin(); it != edge_map.end(); it++){
     cols[K] = it.first;
@@ -156,11 +155,15 @@ void EdgeMap::Set_G_Operator(){
   HYPRE_IJMatrixSetObjectType(par_G_ij, HYPRE_PARCSR);
   HYPRE_IJMatrixInitialize(par_G_ij);
 
-  /* set matrix coefficients */
+  //=====
+  //Set matrix coefficients
+  //=====
   HYPRE_IJMatrixSetValues(par_G_ij, nrows, ncols, rows, cols, values);
-
   HYPRE_IJMatrixAssemble(par_G_ij);
   HYPRE_IJMatrixGetObject(par_G_ij, (void **) &par_G);
 
+  //=====
+  //Clean-up the extra arrays
+  //=====
   delete[] ncols, rows, cols, values;
 };
