@@ -2,9 +2,8 @@
 
 #include "G_operator_gen.hpp"
 
-
-
-
+// Makes the edge map and calculates number
+// of local and global edges (these are non-unique)
 void EdgeMap::Make_Edge_Map(EquationSystems & es, const std::string & system_name)
 {
   // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
@@ -16,7 +15,6 @@ void EdgeMap::Make_Edge_Map(EquationSystems & es, const std::string & system_nam
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
-
 
   //=====
   // Form the initial edge-node-pair-map
@@ -40,38 +38,50 @@ void EdgeMap::Make_Edge_Map(EquationSystems & es, const std::string & system_nam
       ntot_edges_local++;
     }
   }
+}
+
+
+// Sizes up the G-operator matrix for the PETSc-hypre 
+// interface
+void EdgeMap::Size_G_Operator(){
+  //=====
+  // Get the MPI jobsize
+  //=====
+  ierr = MPI_Comm_rank(MPI_COMM_WORLD, &procID);
+  ierr = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+
+
+//===================================================================
+// This is an extremely wasteful procedure however i am using it for
+// as realistically I am not dealing with exascale (yet) an even then
+// an int array is not too bad
+//===================================================================
+  //=====
+  // Set the edge size
+  //=====
+  ProcEdgeSize.clear();
+  for(int I=0; I<nprocs; I++) ProcEdgeSize.push_back(0);
 
   //=====
   // Find the global number of edges 
   //=====
+  ProcEdgeSize[procID] = ntot_edges_local;
+  MPI_Allreduce(&ProcEdgeSize.front(), &ProcEdgeSize.front(), &ProcEdgeSize.size(), MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
   ntot_edges_global = 0; //Just making sure its zero;
-  MPI_Allreduce(&ntot_edges_local, &ntot_edges_global, 1, MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
+  for(int I=0; I<nprocs; i++) ntot_edges_global = ntot_edges_global + ProcEdgeSize[I];
 
+//===================================================================
+//===================================================================
 
   //=====
   // Find the minimum and maximum global
   // node numbers of local process
   //=====
   for(it = edge_map.begin(); it != edge_map.end(); it++){
-    
-  }
-}
-
-
-
-
-void EdgeMap::Find_G_Operator(){
-  for (it = edge_map.begin(); it != edge_map.end(); it++)
-  {
-    unsigned int k = it->first;               // Local Edge number
-    unsigned int m = (it->second).first;      // first  Edge node (global numbering)
-    unsigned int n = (it->second).second;     // second Edge node (global numbering)
-    unsigned int l = local_to_global_edge(k); // Global Edge number
-
-
-
+    Set 
   }
 };
+
 
 
 // Sets the G-operator matrix using the PETSc-hypre 
@@ -82,7 +92,6 @@ void EdgeMap::Set_G_Operator(){
     unsigned int K = edge_map[I].first;
     unsigned int L = edge_map[I].second;
   }
-
 
 
   HYPRE_IJMatrixCreate(comm, ilower, iupper, jlower, jupper, &par_G_ij);

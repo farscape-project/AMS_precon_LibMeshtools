@@ -58,6 +58,9 @@ class EdgeMap
     unsigned int ilower, iupper; //Edge lower and upper bounds
     unsigned int jlower, jupper; //Node lower and upper bounds
 
+    //MPI processor communication stuff
+    int ier, nprocs, procID;
+    std::vector<unsigned int> ProcEdgeSize;
 
     //Function that takes the local edge number
     //and makes it global
@@ -68,10 +71,9 @@ class EdgeMap
     // of local and global edges (these are non-unique)
     void Make_Edge_Map(EquationSystems & es, const std::string & system_name);
 
-
-    // Finds the necessary information needed to caculate
-    // the G-operator matrix
-    void Find_G_Operator();
+    // Sizes up the G-operator matrix for the PETSc-hypre 
+    // interface
+    void Size_G_Operator();
 
     // Sets the G-operator matrix using the PETSc-hypre 
     // interface
