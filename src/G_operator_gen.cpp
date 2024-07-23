@@ -113,7 +113,6 @@ void EdgeMap::Size_G_Operator(){
 // Sets the G-operator matrix using the PETSc-hypre 
 // interface using the IJ matrix interface
 void EdgeMap::Set_G_Operator(){
-//MPI_Comm            comm;
   int nrows;
   int *ncols, *rows, *cols;
   double *values;
@@ -146,7 +145,7 @@ void EdgeMap::Set_G_Operator(){
     cols[K] = it.second;
 	values[K] = -1.0;
     K++;
-  }
+  };
 
   //=====
   //Generate the matrix

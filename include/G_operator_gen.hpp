@@ -57,16 +57,10 @@ class EdgeMap
     HYPRE_ParCSRMatrix par_G;
     unsigned int ilower, iupper; //Edge lower and upper bounds
     unsigned int jlower, jupper; //Node lower and upper bounds
-/*
-MPI_Comm            comm;
-int                 nrows;
-int                *ncols;
-int                *rows;
-int                *cols;
-double             *values;
-*/
+
 
     //MPI processor communication stuff
+    //MPI_Comm  comm;
     int ier, nprocs, procID;
     std::vector<unsigned int> ProcEdgeSize;
 
