@@ -64,22 +64,32 @@ void G_operator::Make_Edge_Map(EquationSystems & es, const std::string & system_
 // removes all remote edges and assigns unique edges
 // a unique proc ID
 void G_operator::prune_Remote_Duplicate_Edges(){
+
+  //Forming an extended neighborhood search
   std::map<unsigned int, unsigned int> EdgeOwnerMap;
   std::map<unsigned int, unsigned int>::iterator jt;
-  
-  //Find the neighbouring processors
+  std::vector<unsigned int> LECantorIters, TLECantorIters; 
 
+  //Find the neighbouring processors
+  int nsends=0, nreceives=0;
 
   //Find out their edge sizes
 
 
   // Send and recieve the Cantor ID's vector 
   // (for the edges) to neighbouring processors
+  for(int I=0; I<nsends; I++) //sends local edge-cantor-iterators to neighbors
+    ier = MPI_Isend(&LECantorIters.front(),LECantorIters.size(),MPI_UNSIGNED, ProcNeighbors[I], procID
+                    ,MPI_COMM_WORLD, MPI_Request *request);
+
+  for(int I=0; I<nreceives; I++) //recieves non-local edge-cantor-iterators to neighbors
+    ier = MPI_Recv(&results_and_rank, results_rank_size, MPI_INT, ProcNeighbors[I], ProcNeighbors[I]
+                 , MPI_COMM_WORLD, &status);
 
 
   // Form a map of the processor owner of each of the edges
-  // the heuristic used here is to make the processor with 
-  // the minimum procID the owner of the edge
+  // the heuristic used here is to make the processor containing
+  // the edge with the minimum procID the owner of the edge
   for(int I=0; I<; I++){
     for(int J=0; J<; J++){
       int K = 0; // The cantor iterator of edge pair
@@ -126,7 +136,9 @@ void G_operator::Size_G_Operator(){
   // Find the global number of edges 
   //=====
   ProcEdgeSize[procID] = ntot_edges_local;
-  MPI_Allreduce(&ProcEdgeSize.front(), &ProcEdgeSize.front(), &ProcEdgeSize.size(), MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce(&ProcEdgeSize.front(), &ProcEdgeSize.front(), &ProcEdgeSize.size()
+              , MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
+
   ntot_edges_global = 0; //Just making sure its zero;
   for(int I=0; I<nprocs; i++) ntot_edges_global = ntot_edges_global + ProcEdgeSize[I];
 
