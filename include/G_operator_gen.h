@@ -33,7 +33,7 @@
 #include <mpi.h>
 
 //
-// Non-unique edges version
+// Unique edges version
 //
 class G_operator
 {
@@ -42,9 +42,6 @@ class G_operator
     // and mapping them to a pair of nodes (the
     // endpoints of the edge)
     std::map<int,std::pair<unsigned int, unsigned int>> edge_map;
-
-    // Iterator for the edge-map
-    std::map<int,std::pair<unsigned int, unsigned int>>::iterator it;
 
     // Total number of local edges
     unsigned int ntot_edges_local = 0;
@@ -58,11 +55,11 @@ class G_operator
     unsigned int ilower, iupper; //Edge lower and upper bounds
     unsigned int jlower, jupper; //Node lower and upper bounds
 
-
     //MPI processor communication stuff
     //MPI_Comm  comm;
     int ier, nprocs, procID;
     std::vector<unsigned int> ProcEdgeSize;
+    std::vector<int> ProcNeighbors;
 
     //Function that takes the local edge number
     //and makes it global
@@ -72,6 +69,12 @@ class G_operator
     // of local and global edges (these are non-unique)
     void Make_Edge_Map(EquationSystems & es, const std::string & system_name);
 
+    // Called within make edgemap if the system is parallel
+    // removes all remote edges and assignns unique edges
+	// a unique proc ID
+    void prune_Remote_Duplicate_Edges();
+
+
     // Sizes up the G-operator matrix for the PETSc-hypre 
     // interface
     void Size_G_Operator();
@@ -80,6 +83,34 @@ class G_operator
     // interface
     void Set_G_Operator();
 
+    //Cantor counting function
+    int Cantors_Counter(unsigned int I , unsigned int J);
+
+    //Inverse Cantor counting function
+    std::pair<unsigned int, unsigned int> Cantors_CounterInv(int K);
+
+    //Finds the difference vector between a pair of vectors
+    template<typename T>
+    void VectorDifference(std::vector<T> c, std::vector<T> a, std::vector<T> b){
+      if(a.size() == b.size()){ //making sure the vector sizes agree
+        c.clear()
+        for(unsigned int I=0; I<a.size(); I++) c.push_back(a[I] - b[I]);
+      }else{
+        std::cout << "Error vectors don't agree in size"
+	  }
+    };
+
+    //sign of inner product of a pair of vectors
+    template<typename T>
+    T InnerProductSign(std::vector<T> a, std::vector<T> b){
+      T ab = cast<T>(0);
+      if(a.size() == b.size()){ //making sure the vector sizes agree
+        for(unsigned int I=0; I<a.size(); I++) ab = ab + a[I]*b[I];
+      }else{
+        std::cout << "Error vectors don't agree in size"
+	  }
+      return ab;
+    };
 
   public:
     G_operator(EquationSystems & es, const std::string & system_name);
