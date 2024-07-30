@@ -202,17 +202,17 @@ void G_operator::Set_G_Operator(){
   std::map<int,std::pair<unsigned int, unsigned int>>::iterator it;
   for(it = edge_map.begin(); it != edge_map.end(); it++){
     //Find orientation of the edge
-    double sign=1.0;
-    sign = sign*InnerProductSign<double>(,)
-    sign = sign*InnerProductSign<double>(,)
-    sign = sign*InnerProductSign<double>(,)
+    double signAB=1.0;
+    signAB = signAB*InnerProductSign<double>(,)
+    signAB = signAB*InnerProductSign<double>(,)
+    signAB = signAB*InnerProductSign<double>(,)
 
     //Assign to CSR matrix+value
     cols[K] = it.first;
-	values[K] =  1.0*sign;
+	values[K] =  1.0*signAB;
     K++;
     cols[K] = it.second;
-	values[K] = -1.0*sign;
+	values[K] = -1.0*signAB;
     K++;
   };
 

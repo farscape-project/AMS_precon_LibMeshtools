@@ -74,7 +74,6 @@ class G_operator
 	// a unique proc ID
     void prune_Remote_Duplicate_Edges();
 
-
     // Sizes up the G-operator matrix for the PETSc-hypre 
     // interface
     void Size_G_Operator();
@@ -92,24 +91,24 @@ class G_operator
     //Finds the difference vector between a pair of vectors
     template<typename T>
     void VectorDifference(std::vector<T> c, std::vector<T> a, std::vector<T> b){
-      if(a.size() == b.size()){ //making sure the vector sizes agree
-        c.clear()
-        for(unsigned int I=0; I<a.size(); I++) c.push_back(a[I] - b[I]);
-      }else{
-        std::cout << "Error vectors don't agree in size"
-	  }
+      c.clear()
+      if(a.size() == b.size()) for(unsigned int I=0; I<a.size(); I++) c.push_back(a[I] - b[I]);
+      if(a.size() != b.size()) std::cout << "Error vectors don't agree in size"
     };
 
     //sign of inner product of a pair of vectors
     template<typename T>
     T InnerProductSign(std::vector<T> a, std::vector<T> b){
-      T ab = cast<T>(0);
-      if(a.size() == b.size()){ //making sure the vector sizes agree
-        for(unsigned int I=0; I<a.size(); I++) ab = ab + a[I]*b[I];
-      }else{
+      if(a.size() != b.size()){ //making sure the vector sizes agree
         std::cout << "Error vectors don't agree in size"
+        return T(0);
 	  }
-      return ab;
+      T ab = T(0);
+	  T signab = T(0);
+      for(unsigned int I=0; I<a.size(); I++) ab = ab + a[I]*b[I];
+      if(ab >  T(0) ) signab = T( 1);
+      if(ab <= T(0) ) signab = T(-1);
+      return signab;
     };
 
   public:
