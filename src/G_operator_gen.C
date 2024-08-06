@@ -1,30 +1,52 @@
 #include "G_operator_gen.hpp"
 
 //The class constructor
-G_operator::G_operator(EquationSystems & es, const std::string & system_name){
-  ierr = MPI_Comm_rank(MPI_COMM_WORLD, &procID);
-  ierr = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-  Make_Edge_Map(es, system_name);
+G_operator::G_operator(EquationSystems & es){
+  if(is_parallel){
+    ierr = MPI_Comm_rank(MPI_COMM_WORLD, &procID);
+    ierr = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  }
+  Make_Edge_Map(es);
   Size_G_Operator();
   Set_G_Operator();
 };
 
 //Cantor counting function
-int G_operator::Cantors_Counter(int I, int J){
+int G_operator::Cantors_Counter(unsigned int I , unsigned int J){
   return (((I+J)*(I+J+1))/2) + J;
 };
 
+std::pair<unsigned int, unsigned int> G_operator::Cantors_CounterInv(int K){
+
+
+  return;
+};
+
+
+void Map_Proc_Neighbors(EquationSystems & es){
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+  {
+    const unsigned int nedges = elem->n_edges();
+    for(unsigned int I=0; I<nedges; I++)
+    {
+      //Find global nodeIDs of the edge endpoints
+      unsigned int m = elem->node_id(elem->edge_nodes_map[I][0]);
+      unsigned int n = elem->node_id(elem->edge_nodes_map[I][1]);
+
+      //Form a unique pair that defines the edge
+      // (inline with Nuno's nedlec numbering system)
+      std::pair<unsigned int, unsigned int> edge_key;
+      if(m < n) edge_key = make_pair(m,n);
+      if(n < m) edge_key = make_pair(n,m);
+      edge_map[edge_key] = Cantors_Counter(edge_key.first,edge_key.second) ;
+    }
+  }
+}
+
 
 // Makes the edge map
-void G_operator::Make_Edge_Map(EquationSystems & es, const std::string & system_name)
+void G_operator::Make_Edge_Map(EquationSystems & es)
 {
-  // Ignore unused parameter warnings when !LIBMESH_ENABLE_AMR.
-  libmesh_ignore(es, system_name);
-
-  // It is a good idea to make sure we are assembling
-  // the proper system.
-  libmesh_assert_equal_to (system_name, "System");
-
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
 
@@ -53,8 +75,8 @@ void G_operator::Make_Edge_Map(EquationSystems & es, const std::string & system_
     }
   }
 
-  //Remove the duplicates
-  if(is_parallel==true ){
+  //Remove the non-local duplicates
+  if(is_parallel){
     prune_Remote_Duplicate_Edges();
   }
   ntot_edges_local = edge_map.size();  
@@ -62,29 +84,37 @@ void G_operator::Make_Edge_Map(EquationSystems & es, const std::string & system_
 
 // Called within make edgemap if the system is parallel
 // removes all remote edges and assigns unique edges
-// a unique proc ID
+// a unique proc ID, This is done by large neighborhood 
+// search
 void G_operator::prune_Remote_Duplicate_Edges(){
 
-  //Forming an extended neighborhood search
+  //Forming an extended neighborhood to search
   std::map<unsigned int, unsigned int> EdgeOwnerMap;
   std::map<unsigned int, unsigned int>::iterator jt;
-  std::vector<unsigned int> LECantorIters, TLECantorIters; 
+  std::vector<unsigned int> LECantorIters, TLECantorIters, IterStart; 
 
-  //Find the neighbouring processors
-  int nsends=0, nreceives=0;
 
-  //Find out their edge sizes
+
+  //Find out their edge sizes and allocate the space
+  int K=0;
+  for(int I=0; I<; I++)
+    for(int J=0; J<; J++)
 
 
   // Send and recieve the Cantor ID's vector 
   // (for the edges) to neighbouring processors
-  for(int I=0; I<nsends; I++) //sends local edge-cantor-iterators to neighbors
+  MPI_Request requests[nmessages];
+  MPI_Status  statuses[nmessages];
+  for(int I=0; I<nmessages; I++) //sends local edge-cantor-iterators to neighbors
     ier = MPI_Isend(&LECantorIters.front(),LECantorIters.size(),MPI_UNSIGNED, ProcNeighbors[I], procID
-                    ,MPI_COMM_WORLD, MPI_Request *request);
+                    ,MPI_COMM_WORLD, &requests[I]);
 
-  for(int I=0; I<nreceives; I++) //recieves non-local edge-cantor-iterators to neighbors
-    ier = MPI_Recv(&results_and_rank, results_rank_size, MPI_INT, ProcNeighbors[I], ProcNeighbors[I]
-                 , MPI_COMM_WORLD, &status);
+  for(int I=0; I<nmessages; I++) //recieves non-local edge-cantor-iterators to neighbors
+    ier = MPI_Recv(&TLECantorIters[IterStart[I]], ProcEdgeSize[I], MPI_UNSIGNED, ProcNeighbors[I], ProcNeighbors[I]
+                 , MPI_COMM_WORLD, &statuses[I]);
+
+  //Just waiting for all communications at this phase to finish
+  ier = MPI_Waitall(nmessages, requests, statuses)
 
 
   // Form a map of the processor owner of each of the edges
@@ -120,12 +150,6 @@ void G_operator::prune_Remote_Duplicate_Edges(){
 // interface
 void G_operator::Size_G_Operator(){
 
-//===================================================================
-// This is an extremely wasteful procedure (stores and nproc size 
-// array on every process) however i am using it as realistically 
-// I am not dealing with exascale (yet) an even then an int array
-// is not too bad
-//===================================================================
   //=====
   // Set the edge size
   //=====
@@ -149,8 +173,7 @@ void G_operator::Size_G_Operator(){
   ilower = 0;
   for(int I=0; I<procID; I++) ilower = ilower + ProcEdgeSize[I];
   iupper = ilower + ProcEdgeSize[procID];
-//===================================================================
-//===================================================================
+
 
   //=====
   // Find the minimum and maximum global

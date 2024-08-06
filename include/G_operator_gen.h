@@ -47,7 +47,7 @@ class G_operator
     unsigned int ntot_edges_local = 0;
 
     // Total number of global edges
-    unsigned int ntot_edges_global = 0;  
+    unsigned int ntot_edges_global = 0;
 
     //Hypre matrix objects
     HYPRE_IJMatrix     par_G_ij;
@@ -57,17 +57,23 @@ class G_operator
 
     //MPI processor communication stuff
     //MPI_Comm  comm;
+    unsigned int nmessages=0;
+    bool is_parallel=false;
     int ier, nprocs, procID;
-    std::vector<unsigned int> ProcEdgeSize;
     std::vector<int> ProcNeighbors;
+    std::vector<unsigned int> ProcEdgeSize;
 
     //Function that takes the local edge number
     //and makes it global
     unsigned int local_to_global_edge(unsigned int local_edge);
 
+    // Forms a list of the local process neighbors using the
+	// nodal partitioning tables
+    void Map_Proc_Neighbors(EquationSystems & es);
+
     // Makes the edge map and calculates number
-    // of local and global edges (these are non-unique)
-    void Make_Edge_Map(EquationSystems & es, const std::string & system_name);
+    // of local and global edges
+    void Make_Edge_Map(EquationSystems & es);
 
     // Called within make edgemap if the system is parallel
     // removes all remote edges and assignns unique edges
@@ -103,8 +109,7 @@ class G_operator
         std::cout << "Error vectors don't agree in size"
         return T(0);
 	  }
-      T ab = T(0);
-	  T signab = T(0);
+      T ab = T(0), signab = T(0);
       for(unsigned int I=0; I<a.size(); I++) ab = ab + a[I]*b[I];
       if(ab >  T(0) ) signab = T( 1);
       if(ab <= T(0) ) signab = T(-1);
@@ -112,6 +117,6 @@ class G_operator
     };
 
   public:
-    G_operator(EquationSystems & es, const std::string & system_name);
+    G_operator(EquationSystems & es);
 }
 
