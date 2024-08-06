@@ -23,7 +23,7 @@ std::pair<unsigned int, unsigned int> G_operator::Cantors_CounterInv(int K){
 };
 
 
-void Map_Proc_Neighbors(EquationSystems & es){
+void G_operator::Map_Proc_Neighbors(EquationSystems & es){
   for (const auto & elem : mesh.active_local_element_ptr_range())
   {
     const unsigned int nedges = elem->n_edges();
@@ -94,11 +94,17 @@ void G_operator::prune_Remote_Duplicate_Edges(){
   std::vector<unsigned int> LECantorIters, TLECantorIters, IterStart; 
 
 
-
-  //Find out their edge sizes and allocate the space
+  //Find out their edge sizes and allocate the space on the vectors
   int K=0;
-  for(int I=0; I<; I++)
-    for(int J=0; J<; J++)
+  IterStart.clear();
+  TLECantorIters.clear();
+  for(int I=0; I<ProcEdgeSize.size(); I++){
+    IterStart.push_back(K);
+    for(int J=0; J<ProcEdgeSize[I]; J++){
+      TLECantorIters.push_back(0);
+      K++;
+    }
+  }
 
 
   // Send and recieve the Cantor ID's vector 
@@ -120,8 +126,8 @@ void G_operator::prune_Remote_Duplicate_Edges(){
   // Form a map of the processor owner of each of the edges
   // the heuristic used here is to make the processor containing
   // the edge with the minimum procID the owner of the edge
-  for(int I=0; I<; I++){
-    for(int J=0; J<; J++){
+  for(int I=0; I<ProcEdgeSize.size(); I++){
+    for(int J=IterStart[I]; J<ProcEdgeSize[I]; J++){
       int K = 0; // The cantor iterator of edge pair
       int L = 0; // The processor ID of that entry
       if(edge_map.find(edgeKey) ==  edge_map.end() ){
@@ -142,7 +148,11 @@ void G_operator::prune_Remote_Duplicate_Edges(){
       }
     }
   }
-  //Successfully pruned all non-local edges  
+  //Successfully pruned all non-local edges 
+  //now just cleanup all the search arrays
+  LECantorIters.clear();
+  TLECantorIters.clear();
+  IterStart.clear();
 };
 
 

@@ -4,7 +4,6 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/fe.h"
-#include "libmesh/quadrature_gauss.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
@@ -14,7 +13,6 @@
 #include "libmesh/sum_shell_matrix.h"
 #include "libmesh/tensor_shell_matrix.h"
 #include "libmesh/sparse_shell_matrix.h"
-#include "libmesh/mesh_refinement.h"
 
 #include "libmesh/getpot.h"
 
