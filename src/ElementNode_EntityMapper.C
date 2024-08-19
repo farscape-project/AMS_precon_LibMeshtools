@@ -14,7 +14,7 @@ class SupplementaryEntityIDs
     template<typename GlobalIterator, typename LocalIterator>
     void AddToMapIteratorIfUnique(std::map<GlobalIterator,LocalIterator> EntityMap, GlobalIterator I, LocalIterator J){
       if( EntityMap.find(I) == EntityMap.end() ){
-        EntityMap[J] = I;
+        EntityMap[I] = J;
         J++;
       }
     }
