@@ -33,7 +33,7 @@ class SupplementaryEntityIDs
           unsigned int nodeID = elem->node_id();
 
           Node & node = mesh.node_ref(nodeID);
-          if( node.processor_id() != LProcID){
+          if( node.processor_id() == LProcID){
             if( elem->is_vertex(nodeID)   ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Vert_to_Global, nodeID, LocalEntitySizes[0]);
             if( elem->is_edge(nodeID)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Edge_to_Global, nodeID, LocalEntitySizes[1]);
             if( elem->is_face(nodeID)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Face_to_Global, nodeID, LocalEntitySizes[2]);
