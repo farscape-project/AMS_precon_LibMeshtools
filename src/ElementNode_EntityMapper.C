@@ -13,7 +13,7 @@ class SupplementaryEntityIDs
 
     template<typename S, typename T>
     void AddToMapIteratorIfUnique(std::map<S,T> EntityMap, S I, T J){
-      if(EntityMap.find(J) != EntityMap.end()){
+      if(EntityMap.find(J) == EntityMap.end()){
         EntityMap[I] = J;
 	    J++;
       }
