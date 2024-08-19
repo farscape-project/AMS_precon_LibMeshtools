@@ -11,11 +11,11 @@ class SupplementaryEntityIDs
 
   public:
 
-    template<typename S, typename T>
-    void AddToMapIteratorIfUnique(std::map<S,T> EntityMap, S I, T J){
+    template<typename GlobalIterator, typename LocalIterator>
+    void AddToMapIteratorIfUnique(std::map<GlobalIterator,LocalIterator> EntityMap, GlobalIterator I, LocalIterator J){
       if( EntityMap.find(J) == EntityMap.end() ){
         EntityMap[I] = J;
-	    J++;
+        J++;
       }
     }
 
