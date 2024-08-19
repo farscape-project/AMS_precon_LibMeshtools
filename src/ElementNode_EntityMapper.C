@@ -13,14 +13,17 @@ class SupplementaryEntityIDs
 
     template<typename S, typename T>
     void AddToMapIteratorIfUnique(std::map<S,T> EntityMap, S I, T J){
-      if(EntityMap.find(J) == EntityMap.end()){
+      if( EntityMap.find(J) == EntityMap.end() ){
         EntityMap[I] = J;
 	    J++;
       }
     }
 
     //Form the entity Maps
-    void FormEntityMaps(){
+    void FormEntityMaps(EquationSystems & es){
+      // Get a constant reference to the mesh object.
+      const MeshBase & mesh = es.get_mesh();
+
       //Find maps entities in global node numberings from local process
       //to a unique contiguous ID 
       unsigned int LProcID = mesh.processor_id();
