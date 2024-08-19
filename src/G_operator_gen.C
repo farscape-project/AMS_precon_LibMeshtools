@@ -12,14 +12,15 @@ G_operator::G_operator(EquationSystems & es){
 };
 
 //Cantor counting function
-int G_operator::Cantors_Counter(unsigned int I , unsigned int J){
+unsigned int G_operator::Cantors_Counter(unsigned int I , unsigned int J){
   return (((I+J)*(I+J+1))/2) + J;
 };
 
-std::pair<unsigned int, unsigned int> G_operator::Cantors_CounterInv(int K){
-
-
-  return;
+std::pair<unsigned int, unsigned int> G_operator::Cantors_CounterInv(unsigned int K){
+  float K_float = float(K);
+  unsigned int W = std::floor(0.5*(std::sqrt(8.0*K_float + 1.0) - 1.0));
+  unsigned int T = (W*W + W)/2;
+  return make_pair( (K-T), (W-K+T) );
 };
 
 
@@ -247,10 +248,7 @@ void G_operator::Set_G_Operator(){
   std::map<int,std::pair<unsigned int, unsigned int>>::iterator it;
   for(it = edge_map.begin(); it != edge_map.end(); it++){
     //Find orientation of the edge
-    double signAB=1.0;
-    signAB = signAB*InnerProductSign<double>(,)
-    signAB = signAB*InnerProductSign<double>(,)
-    signAB = signAB*InnerProductSign<double>(,)
+
 
     //Assign to CSR matrix+value
     cols[K] = it.first;

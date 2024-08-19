@@ -45,8 +45,7 @@ void CurlCurlSystem::init_data ()
 
   // Add the solution variable
   u_var = this->add_variable ("u", FIRST, NEDELEC_ONE);
-  v_var = this->add_variable ("v", FIRST, LAGRANGE);
-  
+
   // The solution is evolving, with a first order time derivative
   this->time_evolving(u_var, 1);
 
@@ -133,33 +132,8 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
   // The number of local degrees of freedom in each variable
   const unsigned int n_u_dofs = c.n_dof_indices(u_var);
 
-  std::vector<dof_id_type> dof_indices;
-  std::vector<dof_id_type> dof_indices_u;
-  std::vector<dof_id_type> dof_indices_v;
-
-  dof_map.dof_indices (elem, dof_indices);
-  dof_map.dof_indices (elem, dof_indices_u, u_var);
-  dof_map.dof_indices (elem, dof_indices_v, v_var);
-
-  const unsigned int n_dofs   = dof_indices.size();
-  const unsigned int n_u_dofs = dof_indices_u.size();
-  const unsigned int n_v_dofs = dof_indices_v.size();
-
-  DenseSubMatrix<Number> Kuu(Ke), Kuv(Ke)
-                         Kvu(Ke), Kvv(Ke);
-
-  DenseSubVector<Number> Fu(Fe),
-                         Fv(Fe);
-
-
-  Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
-  Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
-
-  Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
-  Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
- 
-  Fu.reposition (u_var*n_u_dofs, n_u_dofs);
-  Fv.reposition (v_var*n_u_dofs, n_v_dofs);
+  DenseSubMatrix<Number> & Kuu = c.get_elem_jacobian(u_var, u_var);
+  DenseSubVector<Number> & Fu = c.get_elem_residual(u_var);
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its

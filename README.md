@@ -22,7 +22,7 @@ which explicitly solve for values at these sub-entities cannot store
 information easily. This problem can be resolved partially 
 by using lagrange multipliers to represent the sub-entities and adding
 additional equations, however when it comes to coarsening of the sub-entity spaces
-the topological inforation may be relevant.
+the topological information may be relevant.
 
 # Problem
 I don't aim to majorly change the library, its too mature and I am too tired

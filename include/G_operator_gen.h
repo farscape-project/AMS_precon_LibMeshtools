@@ -92,28 +92,6 @@ class G_operator
     //Inverse Cantor counting function
     std::pair<unsigned int, unsigned int> Cantors_CounterInv(int K);
 
-    //Finds the difference vector between a pair of vectors
-    template<typename T>
-    void VectorDifference(std::vector<T> c, std::vector<T> a, std::vector<T> b){
-      c.clear()
-      if(a.size() == b.size()) for(unsigned int I=0; I<a.size(); I++) c.push_back(a[I] - b[I]);
-      if(a.size() != b.size()) std::cout << "Error vectors don't agree in size"
-    };
-
-    //sign of inner product of a pair of vectors
-    template<typename T>
-    T InnerProductSign(std::vector<T> a, std::vector<T> b){
-      if(a.size() != b.size()){ //making sure the vector sizes agree
-        std::cout << "Error vectors don't agree in size"
-        return T(0);
-	  }
-      T ab = T(0), signab = T(0);
-      for(unsigned int I=0; I<a.size(); I++) ab = ab + a[I]*b[I];
-      if(ab >  T(0) ) signab = T( 1);
-      if(ab <= T(0) ) signab = T(-1);
-      return signab;
-    };
-
   public:
     G_operator(EquationSystems & es);
 }
