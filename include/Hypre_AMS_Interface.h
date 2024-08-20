@@ -19,8 +19,8 @@
 
 // The definition of a geometric element
 #include "libmesh/elem.h"
-#ifndef G_OPERATOR_GEN_H
-#define G_OPERATOR_GEN_H 
+#ifndef HYPRE_AMS_INTERFACE_H
+#define HYPRE_AMS_INTERFACE_H 
 
 #include "libmesh/enum_solver_package.h"
 

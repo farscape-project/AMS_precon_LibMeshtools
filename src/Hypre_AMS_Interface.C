@@ -1,4 +1,4 @@
-#include "G_operator_gen.hpp"
+#include "Hypre_AMS_Interface.hpp"
 
 //The class constructor
 G_operator::G_operator(EquationSystems & es, SupplementaryEntityIDs & SupEiDs){
@@ -37,17 +37,21 @@ void G_operator::Make_Edge_Map(EquationSystems & es, SupplementaryEntityIDs & Su
       }
     }
   }
-
   ntot_edges_local = edge_map.size();  
 }
 
 
 // Sets the G-operator matrix using the PETSc-hypre 
 // interface using the IJ matrix interface
-void G_operator::Set_G_Operator(){
+void G_operator::Set_G_Operator(EquationSystems & es, SupplementaryEntityIDs & SupEiDs){
   int nrows;
   int *ncols, *rows, *cols;
   double *values;
+
+  ilower = ; //local lower bound for global edge number
+  iupper = ; //local upper bound for global edge number
+  jlower = ; //local lower bound for global vertex number
+  jupper = ; //local lower bound for global vertex number
 
 
   //Set the sizing aray values
@@ -59,18 +63,18 @@ void G_operator::Set_G_Operator(){
     row[I] = I + ilower;
   }
 
-  //=====
-  //Set the matrix values and the 
+
+  // Set the matrix values and the 
   // from the edge-map
-  //=====
-  //(There are only two entries per row
-  //so no advanced calculations are really
-  //needed for this)
+  //(There are only two column entries per row
+  // so no advanced calculations are really
+  // needed for this)
   cols   = new int[2*nrows]; 
   values = new double[2*nrows];
-  int K=0;
+
 
   // Iterator for the edge-map
+  int K=0;
   std::map<int,std::pair<unsigned int, unsigned int>>::iterator it;
   for(it = edge_map.begin(); it != edge_map.end(); it++){
     //Assign to CSR matrix+value
@@ -82,22 +86,16 @@ void G_operator::Set_G_Operator(){
     K++;
   };
 
-  //=====
   //Generate the matrix
-  //=====
   HYPRE_IJMatrixCreate(comm, ilower, iupper, jlower, jupper, &par_G_ij);
   HYPRE_IJMatrixSetObjectType(par_G_ij, HYPRE_PARCSR);
-  HYPRE_IJMatrixInitialize(par_G_ij);
+  HYPRE_IJMatrixInitialize(par_G_ij)
 
-  //=====
   //Set matrix coefficients
-  //=====
   HYPRE_IJMatrixSetValues(par_G_ij, nrows, ncols, rows, cols, values);
   HYPRE_IJMatrixAssemble(par_G_ij);
   HYPRE_IJMatrixGetObject(par_G_ij, (void **) &par_G);
 
-  //=====
   //Clean-up the extra arrays
-  //=====
   delete[] ncols, rows, cols, values;
 };

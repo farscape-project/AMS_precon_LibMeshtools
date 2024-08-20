@@ -3,6 +3,7 @@
 
 class SupplementaryEntityIDs
 {
+  public:
     //These maps store a global contiguous numbering of element subentities
     //And map these to the global Node/Dof numbering system within LibMesh
     std::map<unsigned int, unsigned int> Global_to_LVert;
@@ -13,7 +14,6 @@ class SupplementaryEntityIDs
     unsigned int LocalEntityStarts[4] = {0,0,0,0};
     int nprocs, procID;
 
-  public:
 
     //Template that increases the size of a map
 	//if the new entry is unique
