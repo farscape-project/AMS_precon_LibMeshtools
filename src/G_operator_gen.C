@@ -49,9 +49,8 @@ void G_operator::Set_G_Operator(){
   int *ncols, *rows, *cols;
   double *values;
 
-  //=====
+
   //Set the sizing aray values
-  //=====
   nrows  =  ProcEdgeSize[procID]
   ncols  = new int[nrows];
   rows   = new int[nrows];
@@ -74,15 +73,12 @@ void G_operator::Set_G_Operator(){
   // Iterator for the edge-map
   std::map<int,std::pair<unsigned int, unsigned int>>::iterator it;
   for(it = edge_map.begin(); it != edge_map.end(); it++){
-    //Find orientation of the edge
-
-
     //Assign to CSR matrix+value
     cols[K] = it.first;
-	values[K] =  1.0*signAB;
+	values[K] =  1.0;
     K++;
     cols[K] = it.second;
-	values[K] = -1.0*signAB;
+	values[K] = -1.0;
     K++;
   };
 
