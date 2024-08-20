@@ -1,18 +1,18 @@
 #include "Hypre_AMS_Interface.hpp"
 
 //The class constructor
-G_operator::G_operator(EquationSystems & es, SupplementaryEntityIDs & SupEiDs){
+Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es, SupplementaryEntityIDs & SupEiDs){
   if(is_parallel){
     ierr = MPI_Comm_rank(MPI_COMM_WORLD, &procID);
     ierr = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   }
   Make_Edge_Map(es, SupEiDs);
-  Set_G_Operator();
+  Set_Hypre_AMS_Interface();
 };
 
 
 // Makes the edge map
-void G_operator::Make_Edge_Map(EquationSystems & es, SupplementaryEntityIDs & SupEiDs)
+void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es, SupplementaryEntityIDs & SupEiDs)
 {
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -43,7 +43,7 @@ void G_operator::Make_Edge_Map(EquationSystems & es, SupplementaryEntityIDs & Su
 
 // Sets the G-operator matrix using the PETSc-hypre 
 // interface using the IJ matrix interface
-void G_operator::Set_G_Operator(EquationSystems & es, SupplementaryEntityIDs & SupEiDs){
+void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, SupplementaryEntityIDs & SupEiDs){
   int nrows;
   int *ncols, *rows, *cols;
   double *values;
