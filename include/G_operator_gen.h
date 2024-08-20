@@ -86,12 +86,6 @@ class G_operator
     // interface
     void Set_G_Operator();
 
-    //Cantor counting function
-    int Cantors_Counter(unsigned int I , unsigned int J);
-
-    //Inverse Cantor counting function
-    std::pair<unsigned int, unsigned int> Cantors_CounterInv(int K);
-
   public:
     G_operator(EquationSystems & es);
 }

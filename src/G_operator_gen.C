@@ -3,8 +3,8 @@
 //The class constructor
 G_operator::G_operator(EquationSystems & es){
   if(is_parallel){
-    ierr = MPI_Comm_rank(mesh.comm(), &procID);
-    ierr = MPI_Comm_size(mesh.comm(), &nprocs);
+    ierr = MPI_Comm_rank(MPI_COMM_WORLD, &procID);
+    ierr = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
   }
   Make_Edge_Map(es);
   Size_G_Operator();
@@ -112,11 +112,11 @@ void G_operator::prune_Remote_Duplicate_Edges(){
   MPI_Status  statuses[nmessages];
   for(int I=0; I<nmessages; I++) //sends local edge-cantor-iterators to neighbors
     ier = MPI_Isend(&LECantorIters.front(),LECantorIters.size(),MPI_UNSIGNED, ProcNeighbors[I], procID
-                    ,mesh.comm(), &requests[I]);
+                    ,MPI_COMM_WORLD, &requests[I]);
 
   for(int I=0; I<nmessages; I++) //recieves non-local edge-cantor-iterators to neighbors
     ier = MPI_Recv(&TLECantorIters[IterStart[I]], ProcEdgeSize[I], MPI_UNSIGNED, ProcNeighbors[I], ProcNeighbors[I]
-                 , mesh.comm(), &statuses[I]);
+                 , MPI_COMM_WORLD, &statuses[I]);
 
   //Just waiting for all communications at this phase to finish
   ier = MPI_Waitall(nmessages, requests, statuses)
@@ -170,7 +170,7 @@ void G_operator::Size_G_Operator(){
   //=====
   ProcEdgeSize[procID] = ntot_edges_local;
   MPI_Allreduce(&ProcEdgeSize.front(), &ProcEdgeSize.front(), &ProcEdgeSize.size()
-              , MPI_UNSIGNED, MPI_SUM, mesh.comm());
+              , MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
 
   ntot_edges_global = 0; //Just making sure its zero;
   for(int I=0; I<nprocs; i++) ntot_edges_global = ntot_edges_global + ProcEdgeSize[I];
