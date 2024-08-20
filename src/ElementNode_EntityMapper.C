@@ -58,7 +58,7 @@ class SupplementaryEntityIDs
                   , MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
 
       if(procID != 0){
-        for(int I=0; I<nprocs; i++){
+        for(int I=0; I<procID; I++){
           int K = ;
           LocalEntityStarts[0] += procEntitySizesGlobal[I*4 + 0];
           LocalEntityStarts[1] += procEntitySizesGlobal[I*4 + 1];
@@ -66,10 +66,8 @@ class SupplementaryEntityIDs
           LocalEntityStarts[3] += procEntitySizesGlobal[I*4 + 3];
         }
       }
-
-  
- 
-  
     };
+
+
 	//Nothing Interesting
 };

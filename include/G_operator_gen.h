@@ -53,17 +53,6 @@ class G_operator
     unsigned int ilower, iupper; //Edge lower and upper bounds
     unsigned int jlower, jupper; //Node lower and upper bounds
 
-    //MPI processor communication stuff
-    //MPI_Comm  comm;
-    unsigned int nmessages=0;
-    bool is_parallel=false;
-    int ier, nprocs, procID;
-    std::vector<int> ProcNeighbors;
-    std::vector<unsigned int> ProcEdgeSize;
-
-    //Function that takes the local edge number
-    //and makes it global
-    unsigned int local_to_global_edge(unsigned int local_edge);
 
     // Forms a list of the local process neighbors using the
 	// nodal partitioning tables
@@ -72,15 +61,6 @@ class G_operator
     // Makes the edge map and calculates number
     // of local and global edges
     void Make_Edge_Map(EquationSystems & es);
-
-    // Called within make edgemap if the system is parallel
-    // removes all remote edges and assignns unique edges
-	// a unique proc ID
-    void prune_Remote_Duplicate_Edges();
-
-    // Sizes up the G-operator matrix for the PETSc-hypre 
-    // interface
-    void Size_G_Operator();
 
     // Sets the G-operator matrix using the PETSc-hypre 
     // interface
