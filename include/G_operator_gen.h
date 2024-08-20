@@ -19,6 +19,9 @@
 
 // The definition of a geometric element
 #include "libmesh/elem.h"
+#ifndef G_OPERATOR_GEN_H
+#define G_OPERATOR_GEN_H 
+
 #include "libmesh/enum_solver_package.h"
 
 #include <iostream>
@@ -31,12 +34,16 @@
 #include <mpi.h>
 
 //
-// Unique edges version
+// This class forms the AMS prconditioner components
+// including the G-operator, direction vectors
+// and pases it onto the Hypre/PETSc-hypre interface
 //
 class G_operator
 {
   private:
-    // A map containing all the element edges
+    SupplementaryEntityIDs * _SupEiDs;
+
+    // A map containing all the local edges
     // and mapping them to a pair of nodes (the
     // endpoints of the edge)
     std::map<int,std::pair<unsigned int, unsigned int>> edge_map;
@@ -53,15 +60,14 @@ class G_operator
     unsigned int ilower, iupper; //Edge lower and upper bounds
     unsigned int jlower, jupper; //Node lower and upper bounds
 
-    // Makes the edge map and calculates number
-    // of local and global edges
+    // Makes the edge map
     void Make_Edge_Map(EquationSystems & es, SupplementaryEntityIDs & SupEiDs);
 
-    // Sets the G-operator matrix using the PETSc-hypre 
+    // Sets the G-operator matrix using the Hypre/PETSc-hypre
     // interface
     void Set_G_Operator();
 
   public:
     G_operator(EquationSystems & es, SupplementaryEntityIDs & SupEiDs);
 }
-
+#endif
