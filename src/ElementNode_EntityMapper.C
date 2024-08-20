@@ -2,10 +2,10 @@ class SupplementaryEntityIDs
 {
     //These maps store a global contiguous numbering of element subentities
     //And map these to the global Node/Dof numbering system within LibMesh
-    std::map<unsigned int, unsigned int> Vert_to_Global;
-    std::map<unsigned int, unsigned int> Edge_to_Global;
-    std::map<unsigned int, unsigned int> Face_to_Global;
-    std::map<unsigned int, unsigned int> Volm_to_Global;
+    std::map<unsigned int, unsigned int> Global_to_LVert;
+    std::map<unsigned int, unsigned int> Global_to_LEdge;
+    std::map<unsigned int, unsigned int> Global_to_LFace;
+    std::map<unsigned int, unsigned int> Global_to_LVolm;
     unsigned int LocalEntitySizes[4] = {0,0,0,0};
     unsigned int LocalEntityStarts[4] = {0,0,0,0};
     int nprocs, procID;
@@ -35,10 +35,10 @@ class SupplementaryEntityIDs
 
           Node & node = mesh.node_ref(nodeID);
           if( node.processor_id() == LProcID){
-            if( elem->is_vertex(nodeID)   ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Vert_to_Global, nodeID, LocalEntitySizes[0]);
-            if( elem->is_edge(nodeID)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Edge_to_Global, nodeID, LocalEntitySizes[1]);
-            if( elem->is_face(nodeID)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Face_to_Global, nodeID, LocalEntitySizes[2]);
-            if( elem->is_internal(nodeID) ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Volm_to_Global, nodeID, LocalEntitySizes[3]);
+            if( elem->is_vertex(nodeID)   ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LVert, nodeID, LocalEntitySizes[0]);
+            if( elem->is_edge(nodeID)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LEdge, nodeID, LocalEntitySizes[1]);
+            if( elem->is_face(nodeID)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LFace, nodeID, LocalEntitySizes[2]);
+            if( elem->is_internal(nodeID) ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LVolm, nodeID, LocalEntitySizes[3]);
           }
         }
       }
@@ -68,6 +68,13 @@ class SupplementaryEntityIDs
       }
     };
 
-
+    bool Is_LocalEdge(unsigned int nodeID){
+      if( Global_to_LEdge.find(nodeID) == Global_to_LEdge.end() ) return false;
+      return false;
+    }
+	
+    int EdgeLocalID(unsigned int nodeID){
+      return Global_to_LEdge[nodeID];
+    }
 	//Nothing Interesting
 };

@@ -53,20 +53,15 @@ class G_operator
     unsigned int ilower, iupper; //Edge lower and upper bounds
     unsigned int jlower, jupper; //Node lower and upper bounds
 
-
-    // Forms a list of the local process neighbors using the
-	// nodal partitioning tables
-    void Map_Proc_Neighbors(EquationSystems & es);
-
     // Makes the edge map and calculates number
     // of local and global edges
-    void Make_Edge_Map(EquationSystems & es);
+    void Make_Edge_Map(EquationSystems & es, SupplementaryEntityIDs & SupEiDs);
 
     // Sets the G-operator matrix using the PETSc-hypre 
     // interface
     void Set_G_Operator();
 
   public:
-    G_operator(EquationSystems & es);
+    G_operator(EquationSystems & es, SupplementaryEntityIDs & SupEiDs);
 }
 
