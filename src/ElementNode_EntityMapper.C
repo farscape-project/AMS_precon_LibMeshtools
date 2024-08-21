@@ -35,7 +35,7 @@ void SupplementaryEntityIDs::FormEntityMaps(EquationSystems & es){
   procEntitySizesGlobal[procID*4 + 2] = LocalEntitySizes[2];
   procEntitySizesGlobal[procID*4 + 3] = LocalEntitySizes[3];
   MPI_Allreduce(&procEntitySizesGlobal.front(), &procEntitySizesGlobal.front(), &procEntitySizesGlobal.size()
-              , MPI_UNSIGNED, MPI_SUM, MPI_COMM_WORLD);
+              , MPI_UNSIGNED, MPI_SUM, mesh.comm());
 
   if(procID != 0){
     for(int I=0; I<procID; I++){

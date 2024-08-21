@@ -1,18 +1,18 @@
 #include "Hypre_AMS_Interface.hpp"
 
 //The class constructor
-Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es, SupplementaryEntityIDs & SupEiDs){
+Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es): _SupEiDs(es){
   if(is_parallel){
-    ierr = MPI_Comm_rank(MPI_COMM_WORLD, &procID);
-    ierr = MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+    ierr = MPI_Comm_rank(mesh.comm(), &procID);
+    ierr = MPI_Comm_size(mesh.comm(), &nprocs);
   }
-  Make_Edge_Map(es, SupEiDs);
+  Make_Edge_Map(es);
   Set_Hypre_AMS_Interface();
 };
 
 
 // Makes the edge map
-void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es, SupplementaryEntityIDs & SupEiDs)
+void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es)
 {
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -26,7 +26,7 @@ void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es, SupplementaryEntit
     {
       //Find global nodeIDs of the edge endpoints
       unsigned int EdgeID = elem->node_id(elem->edge_nodes_map[I][2]))
-      if( SupEiDs->Is_LocalEdge(EdgeID) ){
+      if( _SupEiDs->Is_LocalEdge(EdgeID) ){
         //Form a pair of the to vertices at either end of the edge
 		unsigned int EdgeLocalID = EdgeLocalID(EdgeID);
 		unsigned int m = elem->node_id(elem->edge_nodes_map[I][0]));
@@ -43,15 +43,22 @@ void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es, SupplementaryEntit
 
 // Sets the G-operator matrix using the PETSc-hypre 
 // interface using the IJ matrix interface
-void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, SupplementaryEntityIDs & SupEiDs){
+void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
+
+
+  // Get a constant reference to the mesh object.
+  const MeshBase & mesh = es.get_mesh();
+
+  //size up and set up the arrays
   int nrows;
   int *ncols, *rows, *cols;
-  double *values;
+  double *Matvalues, *Vecvalues;
 
-  ilower = ; //local lower bound for global edge number
-  iupper = ; //local upper bound for global edge number
-  jlower = ; //local lower bound for global vertex number
-  jupper = ; //local lower bound for global vertex number
+  ilower = _SupEiDs->LocalEntityStarts[1];         //local lower bound for global edge number
+  iupper = ilower + _SupEiDs->LocalEntitySizes[1]; //local upper bound for global edge number
+
+  jlower = ;                                       //local lower bound for global vertex number
+  jupper = ;                                       //local lower bound for global vertex number
 
 
   //Set the sizing aray values
@@ -70,7 +77,7 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, Suppleme
   // so no advanced calculations are really
   // needed for this)
   cols   = new int[2*nrows]; 
-  values = new double[2*nrows];
+  Matvalues = new double[2*nrows];
 
 
   // Iterator for the edge-map
@@ -79,22 +86,77 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, Suppleme
   for(it = edge_map.begin(); it != edge_map.end(); it++){
     //Assign to CSR matrix+value
     cols[K] = it.first;
-	values[K] =  1.0;
+	Matvalues[K] =  1.0;
     K++;
     cols[K] = it.second;
-	values[K] = -1.0;
+	Matvalues[K] = -1.0;
     K++;
   };
 
-  //Generate the matrix
-  HYPRE_IJMatrixCreate(comm, ilower, iupper, jlower, jupper, &par_G_ij);
-  HYPRE_IJMatrixSetObjectType(par_G_ij, HYPRE_PARCSR);
-  HYPRE_IJMatrixInitialize(par_G_ij)
 
-  //Set matrix coefficients
-  HYPRE_IJMatrixSetValues(par_G_ij, nrows, ncols, rows, cols, values);
+/*
+  //Generate the matrix
+  HYPRE_IJMatrixCreate(mesh.comm(), ilower, iupper, jlower, jupper, &par_G_ij);
+  HYPRE_IJMatrixSetObjectType(par_G_ij, HYPRE_PARCSR);
+  HYPRE_IJMatrixInitialize(par_G_ij);
+
+  //Set matrix G-operator coefficients
+  HYPRE_IJMatrixSetValues(par_G_ij, nrows, ncols, rows, cols, Matvalues);
   HYPRE_IJMatrixAssemble(par_G_ij);
   HYPRE_IJMatrixGetObject(par_G_ij, (void **) &par_G);
+
+
+  //Set vector nodal coordinate coefficients
+  HYPRE_IJVectorCreate(mesh.comm(), jlower, jupper, &x_ij_vec);
+  HYPRE_IJVectorCreate(mesh.comm(), jlower, jupper, &y_ij_vec);
+  HYPRE_IJVectorCreate(mesh.comm(), jlower, jupper, &z_ij_vec);
+
+  HYPRE_IJVectorSetObjectType(ij_vector, HYPRE_PARCSR);
+  HYPRE_IJVectorInitialize(ij_vector);
+
+
+HYPRE_IJVectorSetValues(ij_vector, nvalues, indices, values);
+...
+
+HYPRE_IJVectorAssemble(ij_vector);
+HYPRE_IJVectorGetObject(ij_vector, (void **) &par_vector);
+
+    HYPRE_IJVector   x_ij_vec, y_ij_vec, z_ij_vec; //Coordinate vectors at vertices (IJ_vec)
+
+
+
+    HYPRE_ParCSRMatrix par_G;                              //G-Operator CSR matrix
+    HYPRE_ParVector    par_xcoord, par_ycoord, par_zcoord; //coordinates at vertices (CSR-vec)
+    HYPRE_ParVector    par_xvec, par_yvec, par_zvec;       //Edge unit vectors (CSR-vec)
+*/
+
+  Mat  par_G;                              //G-Operator CSR matrix
+  Vec  par_xcoord, par_ycoord, par_zcoord; //coordinates at vertices (CSR-vec)
+  Vec  par_xvec, par_yvec, par_zvec;       //Edge unit vectors (CSR-vec)
+
+
+  PetscMatrixBase<Number> par_G;
+  PetscVector<Number> x_vec(x, preconditioner->comm());
+
+
+  //Create the empty matrix and vectors
+  petscErr = MatCreate(mesh.comm(), par_G);
+
+
+  //Set the G-Operator matrix
+  petscErr = PCHYPRESetDiscreteGradient(PC pc, par_G);
+
+
+  //Multiply the G-operator by the coordinates
+  //to get the edge vectors
+  petscErr = MatMult(par_G, par_xcoord, par_xvec);
+  petscErr = MatMult(par_G, par_ycoord, par_yvec);
+  petscErr = MatMult(par_G, par_zcoord, par_zvec);
+
+
+  //Set the G-operator matrix
+  petscErr = PCHYPRESetEdgeConstantVectors(PC pc, par_xvec, par_yvec, par_zvec);
+
 
   //Clean-up the extra arrays
   delete[] ncols, rows, cols, values;
