@@ -92,16 +92,22 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   };
 
 
-  //coordinates at vertices (CSR-vec)
+  //coordinates at vertices (PETSc Vector)
+  int CoordsSize = _SupEiDs->Global_to_LVert.size();
   Vec  par_xcoord, par_ycoord, par_zcoord; 
+  petscErr = VecCreate(mesh.comm(),&par_xcoord);
+  petscErr = VecCreate(mesh.comm(),&par_ycoord);
+  petscErr = VecCreate(mesh.comm(),&par_zcoord)
 
+  //Set the coordinate vector sizes
+  petscErr = VecSetSizes(par_xcoord,PETSC_DECIDE,n);
+  petscErr = VecSetFromOptions(par_xcoord);
+  petscErr = VecDuplicate(par_xcoord,&par_ycoord);
+  petscErr = VecDuplicate(par_xcoord,&par_zcoord);
 /*
-
-
 for(auto & node : this->get_mesh().node_ptr_range()){
   Global_to_LVert
 }
-
 */
 
 

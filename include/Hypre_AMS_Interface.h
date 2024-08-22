@@ -67,7 +67,6 @@ class Hypre_AMS_Interface
     Mat  par_G;                  //PETSc G-Operator CSR matrix
     Vec  par_xvec, par_yvec, ;   //PETSc Edge unit vectors (CSR-vec)
 
-
   public:
     unsigned int ilower, iupper; //Edge lower and upper bounds
     unsigned int jlower, jupper; //Node lower and upper bounds
