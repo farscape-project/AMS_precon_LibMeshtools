@@ -45,7 +45,6 @@ void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es)
 // interface using the IJ matrix interface
 void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
-
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
 
@@ -56,7 +55,6 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
   ilower = _SupEiDs->LocalEntityStarts[1];         //local lower bound for global edge number
   iupper = ilower + _SupEiDs->LocalEntitySizes[1]; //local upper bound for global edge number
-
   jlower = ;                                       //local lower bound for global vertex number
   jupper = ;                                       //local lower bound for global vertex number
 
@@ -94,49 +92,17 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   };
 
 
+  //coordinates at vertices (CSR-vec)
+  Vec  par_xcoord, par_ycoord, par_zcoord; 
+
 /*
-  //Generate the matrix
-  HYPRE_IJMatrixCreate(mesh.comm(), ilower, iupper, jlower, jupper, &par_G_ij);
-  HYPRE_IJMatrixSetObjectType(par_G_ij, HYPRE_PARCSR);
-  HYPRE_IJMatrixInitialize(par_G_ij);
-
-  //Set matrix G-operator coefficients
-  HYPRE_IJMatrixSetValues(par_G_ij, nrows, ncols, rows, cols, Matvalues);
-  HYPRE_IJMatrixAssemble(par_G_ij);
-  HYPRE_IJMatrixGetObject(par_G_ij, (void **) &par_G);
 
 
-  //Set vector nodal coordinate coefficients
-  HYPRE_IJVectorCreate(mesh.comm(), jlower, jupper, &x_ij_vec);
-  HYPRE_IJVectorCreate(mesh.comm(), jlower, jupper, &y_ij_vec);
-  HYPRE_IJVectorCreate(mesh.comm(), jlower, jupper, &z_ij_vec);
+for(auto & node : this->get_mesh().node_ptr_range()){
+  Global_to_LVert
+}
 
-  HYPRE_IJVectorSetObjectType(ij_vector, HYPRE_PARCSR);
-  HYPRE_IJVectorInitialize(ij_vector);
-
-
-HYPRE_IJVectorSetValues(ij_vector, nvalues, indices, values);
-...
-
-HYPRE_IJVectorAssemble(ij_vector);
-HYPRE_IJVectorGetObject(ij_vector, (void **) &par_vector);
-
-    HYPRE_IJVector   x_ij_vec, y_ij_vec, z_ij_vec; //Coordinate vectors at vertices (IJ_vec)
-
-
-
-    HYPRE_ParCSRMatrix par_G;                              //G-Operator CSR matrix
-    HYPRE_ParVector    par_xcoord, par_ycoord, par_zcoord; //coordinates at vertices (CSR-vec)
-    HYPRE_ParVector    par_xvec, par_yvec, par_zvec;       //Edge unit vectors (CSR-vec)
 */
-
-  Mat  par_G;                              //G-Operator CSR matrix
-  Vec  par_xcoord, par_ycoord, par_zcoord; //coordinates at vertices (CSR-vec)
-  Vec  par_xvec, par_yvec, par_zvec;       //Edge unit vectors (CSR-vec)
-
-
-  PetscMatrixBase<Number> par_G;
-  PetscVector<Number> x_vec(x, preconditioner->comm());
 
 
   //Create the empty matrix and vectors

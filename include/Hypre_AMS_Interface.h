@@ -62,19 +62,11 @@ class Hypre_AMS_Interface
     //Hypre-PETSc linear algebra objects
 	//Starting with the IJ object moving
     //into the Parallel CSR stored objects
-    PetscErrorCode petscErr; //PETSc error code
+    PetscErrorCode petscErr;     //PETSc error code
     PetscInt       ncols, nrows; //PETSc integers
-    PetscMatrixBase<T> * matrix
+    Mat  par_G;                  //PETSc G-Operator CSR matrix
+    Vec  par_xvec, par_yvec, ;   //PETSc Edge unit vectors (CSR-vec)
 
-
-/*
-    HYPRE_IJMatrix   par_G_ij;
-    HYPRE_IJVector   x_ij_vec, y_ij_vec, z_ij_vec; //Coordinate vectors at vertices (IJ_vec)
-
-    HYPRE_ParCSRMatrix par_G;                              //G-Operator CSR matrix
-    HYPRE_ParVector    par_xcoord, par_ycoord, par_zcoord; //coordinates at vertices (CSR-vec)
-    HYPRE_ParVector    par_xvec, par_yvec, par_zvec;       //Edge unit vectors (CSR-vec)
-*/
 
   public:
     unsigned int ilower, iupper; //Edge lower and upper bounds
