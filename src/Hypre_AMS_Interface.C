@@ -111,9 +111,10 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   it = _SupEiDs->Global_to_LVert.begin();
   for(int I=istart; I<iend; I++){
     int nodeID = it->first;
-    PetscScalar x = (PetscScalar)( mesh. );
-    PetscScalar y = (PetscScalar)( mesh. );
-    PetscScalar z = (PetscScalar)( mesh. );
+	Node & node = mesh.node_ref(nodeID);
+    PetscScalar x = (PetscScalar)( node(0) );
+    PetscScalar y = (PetscScalar)( node(1) );
+    PetscScalar z = (PetscScalar)( node(2) );
     VecSetValues(par_xcoord,1,&I,&x,INSERT_VALUES);
     VecSetValues(par_ycoord,1,&I,&y,INSERT_VALUES);
     VecSetValues(par_zcoord,1,&I,&z,INSERT_VALUES);
