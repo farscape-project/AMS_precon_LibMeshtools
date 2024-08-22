@@ -43,7 +43,7 @@ void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es)
 
 // Sets the G-operator matrix using the PETSc-hypre 
 // interface using the IJ matrix interface
-void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
+void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, PC pc){
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -127,7 +127,7 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
 
   //Set the G-Operator matrix
-  petscErr = PCHYPRESetDiscreteGradient(PC pc, par_G);
+  petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
 
 
   //Multiply the G-operator by the coordinates
@@ -138,7 +138,7 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
 
   //Set the G-operator matrix
-  petscErr = PCHYPRESetEdgeConstantVectors(PC pc, par_xvec, par_yvec, par_zvec);
+  petscErr = PCHYPRESetEdgeConstantVectors(pc, par_xvec, par_yvec, par_zvec);
 
 
   //Clean-up the extra arrays
