@@ -93,21 +93,29 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
 
   //coordinates at vertices (PETSc Vector)
-  int CoordsSize = _SupEiDs->Global_to_LVert.size();
   Vec  par_xcoord, par_ycoord, par_zcoord; 
   petscErr = VecCreate(mesh.comm(),&par_xcoord);
   petscErr = VecCreate(mesh.comm(),&par_ycoord);
   petscErr = VecCreate(mesh.comm(),&par_zcoord)
 
   //Set the coordinate vector sizes and paritions
-  petscErr = VecSetSizes(par_xcoord,PETSC_DECIDE,n);
+  int CoordsSize = _SupEiDs->Global_to_LVert.size();
+  petscErr = VecSetSizes(par_xcoord,PETSC_DECIDE,CoordsSize);
   petscErr = VecSetFromOptions(par_xcoord);
   petscErr = VecDuplicate(par_xcoord,&par_ycoord);
   petscErr = VecDuplicate(par_xcoord,&par_zcoord);
 
   //Setting the vector-coordinate Values
-  VecGetOwnershipRange(x,&istart,&iend);
-
+  int istart,iend;
+  VecGetOwnershipRange(par_xcoord,&istart,&iend);
+  for(int I=istart; I<iend; I++){
+    PetscScalar x = (PetscScalar)(i);
+    PetscScalar y = (PetscScalar)(i);
+    PetscScalar z = (PetscScalar)(i);
+    VecSetValues(par_xcoord,1,&I,&x,INSERT_VALUES);
+    VecSetValues(par_ycoord,1,&I,&y,INSERT_VALUES);
+    VecSetValues(par_zcoord,1,&I,&z,INSERT_VALUES);
+  }
   
 
 /*
@@ -137,5 +145,8 @@ for(auto & node : this->get_mesh().node_ptr_range()){
 
 
   //Clean-up the extra arrays
+  ierr = VecDestroy(&par_xcoord);
+  ierr = VecDestroy(&par_ycoord);
+  ierr = VecDestroy(&par_zcoord);
   delete[] ncols, rows, cols, values;
 };
