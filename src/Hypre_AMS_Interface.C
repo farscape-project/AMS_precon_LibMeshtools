@@ -99,11 +99,17 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   petscErr = VecCreate(mesh.comm(),&par_ycoord);
   petscErr = VecCreate(mesh.comm(),&par_zcoord)
 
-  //Set the coordinate vector sizes
+  //Set the coordinate vector sizes and paritions
   petscErr = VecSetSizes(par_xcoord,PETSC_DECIDE,n);
   petscErr = VecSetFromOptions(par_xcoord);
   petscErr = VecDuplicate(par_xcoord,&par_ycoord);
   petscErr = VecDuplicate(par_xcoord,&par_zcoord);
+
+  //Setting the vector-coordinate Values
+  VecGetOwnershipRange(x,&istart,&iend);
+
+  
+
 /*
 for(auto & node : this->get_mesh().node_ptr_range()){
   Global_to_LVert
