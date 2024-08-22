@@ -91,7 +91,6 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
     K++;
   };
 
-
   //coordinates at vertices (PETSc Vector)
   Vec  par_xcoord, par_ycoord, par_zcoord; 
   petscErr = VecCreate(mesh.comm(),&par_xcoord);
@@ -108,21 +107,18 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   //Setting the vector-coordinate Values
   int istart,iend;
   VecGetOwnershipRange(par_xcoord,&istart,&iend);
+  std::map<unsigned int, unsigned int>::iterator it;
+  it = _SupEiDs->Global_to_LVert.begin();
   for(int I=istart; I<iend; I++){
-    PetscScalar x = (PetscScalar)(i);
-    PetscScalar y = (PetscScalar)(i);
-    PetscScalar z = (PetscScalar)(i);
+    int nodeID = it->first;
+    PetscScalar x = (PetscScalar)( mesh. );
+    PetscScalar y = (PetscScalar)( mesh. );
+    PetscScalar z = (PetscScalar)( mesh. );
     VecSetValues(par_xcoord,1,&I,&x,INSERT_VALUES);
     VecSetValues(par_ycoord,1,&I,&y,INSERT_VALUES);
     VecSetValues(par_zcoord,1,&I,&z,INSERT_VALUES);
+	it++;
   }
-  
-
-/*
-for(auto & node : this->get_mesh().node_ptr_range()){
-  Global_to_LVert
-}
-*/
 
 
   //Create the empty matrix and vectors
