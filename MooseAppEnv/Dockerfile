@@ -42,6 +42,7 @@ RUN apt-get update && \
     libsdl2-dev \
     libssl-dev \
     rsync \
+    nano \
     xxd
 
 #Install python packages that should be from Pip
