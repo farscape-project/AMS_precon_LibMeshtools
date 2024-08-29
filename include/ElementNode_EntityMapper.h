@@ -1,6 +1,12 @@
 #ifndef ELEMENTNODE_ENTITYMAPPER_H
 #define ELEMENTNODE_ENTITYMAPPER_H 
 
+#include <map>
+#include "libmesh/equation_systems.h"
+#include "libmesh/elem.h"
+
+using namespace libMesh;
+
 class SupplementaryEntityIDs
 {
   public:

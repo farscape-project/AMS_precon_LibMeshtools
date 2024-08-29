@@ -1,13 +1,14 @@
-#include "Hypre_AMS_Interface.hpp"
+#include "Hypre_AMS_Interface.h"
 
 //The class constructor
-Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es): _SupEiDs(es){
-  if(is_parallel){
-    ierr = MPI_Comm_rank(mesh.comm(), &procID);
-    ierr = MPI_Comm_size(mesh.comm(), &nprocs);
-  }
+Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es){
+  //if(is_parallel){
+    int ierr = MPI_Comm_rank(es.get_mesh().comm().get(), &_SupEiDs.procID);
+    ierr = MPI_Comm_size(es.get_mesh().comm().get(), &_SupEiDs.nprocs);
+  //}
+  _SupEiDs.FormEntityMaps(es);
   Make_Edge_Map(es);
-  Set_Hypre_AMS_Interface();
+  //Set_Hypre_AMS_Interface();
 };
 
 
@@ -25,14 +26,14 @@ void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es)
     for(unsigned int I=0; I<nedges; I++)
     {
       //Find global nodeIDs of the edge endpoints
-      unsigned int EdgeID = elem->node_id(elem->edge_nodes_map[I][2]))
-      if( _SupEiDs->Is_LocalEdge(EdgeID) ){
+      unsigned int EdgeID = elem->node_id(elem->local_edge_node(I, 2));
+      if( _SupEiDs.Is_LocalEdge(EdgeID) ){
         //Form a pair of the to vertices at either end of the edge
-		unsigned int EdgeLocalID = EdgeLocalID(EdgeID);
-		unsigned int m = elem->node_id(elem->edge_nodes_map[I][0]));
-        unsigned int n = elem->node_id(elem->edge_nodes_map[I][1]));
+		unsigned int EdgeLocalID = _SupEiDs.EdgeLocalID(EdgeID);
+		unsigned int m = elem->node_id(elem->local_edge_node(I, 0));
+        unsigned int n = elem->node_id(elem->local_edge_node(I, 1));
         std::pair<unsigned int, unsigned int> edge_EndPair;
-        edge_EndPair = make_pair(m,n);
+        edge_EndPair = std::make_pair(m,n);
         edge_map[EdgeLocalID] = edge_EndPair;
       }
     }
@@ -53,19 +54,19 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, PC pc){
   int *ncols, *rows, *cols;
   double *Matvalues, *Vecvalues;
 
-  ilower = _SupEiDs->LocalEntityStarts[1];         //local lower bound for global edge number
-  iupper = ilower + _SupEiDs->LocalEntitySizes[1]; //local upper bound for global edge number
-  jlower = ;                                       //local lower bound for global vertex number
-  jupper = ;                                       //local lower bound for global vertex number
+  ilower = _SupEiDs.LocalEntityStarts[1];         //local lower bound for global edge number
+  iupper = ilower + _SupEiDs.LocalEntitySizes[1]; //local upper bound for global edge number
+  //jlower = ;                                       //local lower bound for global vertex number
+  //jupper = ;                                       //local lower bound for global vertex number
 
 
   //Set the sizing aray values
-  nrows  =  ProcEdgeSize[procID]
+  nrows  =  4;//ProcEdgeSize[_SupEiDs.procID];
   ncols  = new int[nrows];
   rows   = new int[nrows];
   for(int I=0; I<nrows; I++){
     ncols[I] = 2;
-    row[I] = I + ilower;
+    rows[I] = I + ilower;
   }
 
 
@@ -80,38 +81,36 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, PC pc){
 
   // Iterator for the edge-map
   int K=0;
-  std::map<int,std::pair<unsigned int, unsigned int>>::iterator it;
-  for(it = edge_map.begin(); it != edge_map.end(); it++){
+  for(auto it = edge_map.begin(); it != edge_map.end(); it++){
     //Assign to CSR matrix+value
-    cols[K] = it.first;
+    cols[K] = it->second.first;
 	Matvalues[K] =  1.0;
     K++;
-    cols[K] = it.second;
+    cols[K] = it->second.second;
 	Matvalues[K] = -1.0;
     K++;
   };
 
   //coordinates at vertices (PETSc Vector)
   Vec  par_xcoord, par_ycoord, par_zcoord; 
-  petscErr = VecCreate(mesh.comm(),&par_xcoord);
-  petscErr = VecCreate(mesh.comm(),&par_ycoord);
-  petscErr = VecCreate(mesh.comm(),&par_zcoord)
+  petscErr = VecCreate(mesh.comm().get(),&par_xcoord);
+  petscErr = VecCreate(mesh.comm().get(),&par_ycoord);
+  petscErr = VecCreate(mesh.comm().get(),&par_zcoord);
 
   //Set the coordinate vector sizes and paritions
-  int CoordsSize = _SupEiDs->Global_to_LVert.size();
+  int CoordsSize = _SupEiDs.Global_to_LVert.size();
   petscErr = VecSetSizes(par_xcoord,PETSC_DECIDE,CoordsSize);
   petscErr = VecSetFromOptions(par_xcoord);
   petscErr = VecDuplicate(par_xcoord,&par_ycoord);
   petscErr = VecDuplicate(par_xcoord,&par_zcoord);
 
   //Setting the vector-coordinate Values
-  int istart,iend;
+  PetscInt istart,iend;
   VecGetOwnershipRange(par_xcoord,&istart,&iend);
-  std::map<unsigned int, unsigned int>::iterator it;
-  it = _SupEiDs->Global_to_LVert.begin();
-  for(int I=istart; I<iend; I++){
+  auto it = _SupEiDs.Global_to_LVert.begin();
+  for(PetscInt I=istart; I<iend; I++){
     int nodeID = it->first;
-	Node & node = mesh.node_ref(nodeID);
+	const Node & node = mesh.node_ref(nodeID);
     PetscScalar x = (PetscScalar)( node(0) );
     PetscScalar y = (PetscScalar)( node(1) );
     PetscScalar z = (PetscScalar)( node(2) );
@@ -123,7 +122,7 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, PC pc){
 
 
   //Create the empty matrix and vectors
-  petscErr = MatCreate(mesh.comm(), par_G);
+  petscErr = MatCreate(mesh.comm().get(), &par_G);
 
 
   //Set the G-Operator matrix
@@ -142,8 +141,8 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es, PC pc){
 
 
   //Clean-up the extra arrays
-  ierr = VecDestroy(&par_xcoord);
+  int ierr = VecDestroy(&par_xcoord);
   ierr = VecDestroy(&par_ycoord);
   ierr = VecDestroy(&par_zcoord);
-  delete[] ncols, rows, cols, values;
+  delete[] ncols, rows, cols, Matvalues, Vecvalues;
 };

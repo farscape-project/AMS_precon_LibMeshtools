@@ -29,9 +29,14 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 #include <vector>
-#include <pair>
+#include <utility>
 #include <map>
 #include <mpi.h>
+
+#include "ElementNode_EntityMapper.h"
+#include <petsc.h>
+
+using namespace libMesh;
 
 //
 // This class forms the AMS prconditioner components
@@ -45,7 +50,7 @@ class Hypre_AMS_Interface
   private:
     //Contains a mesh Map to all the contiguous IDs of the 
 	// entities mapped to a node in the mesh (node ->(vertex,face,volume) )
-    SupplementaryEntityIDs * _SupEiDs;
+    SupplementaryEntityIDs _SupEiDs;
 
     // A map containing all the local edges
     // and mapping them to a pair of nodes (the
@@ -65,7 +70,7 @@ class Hypre_AMS_Interface
     PetscErrorCode petscErr;     //PETSc error code
     PetscInt       ncols, nrows; //PETSc integers
     Mat  par_G;                  //PETSc G-Operator CSR matrix
-    Vec  par_xvec, par_yvec, ;   //PETSc Edge unit vectors (CSR-vec)
+    Vec  par_xvec, par_yvec, par_zvec ;    //PETSc Edge unit vectors (CSR-vec)
 
   public:
     unsigned int ilower, iupper; //Edge lower and upper bounds
@@ -79,7 +84,9 @@ class Hypre_AMS_Interface
     // interface
     void Set_G_Operator();
 
+    void Set_Hypre_AMS_Interface(EquationSystems & es, PC pc);
+
   public:
     Hypre_AMS_Interface(EquationSystems & es);
-}
+};
 #endif

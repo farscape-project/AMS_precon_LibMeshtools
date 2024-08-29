@@ -1,4 +1,4 @@
-#incluide "ElementNode_EntityMapper.h"
+#include "ElementNode_EntityMapper.h"
 
 //Form the entity Maps
 void SupplementaryEntityIDs::FormEntityMaps(EquationSystems & es){
@@ -11,9 +11,9 @@ void SupplementaryEntityIDs::FormEntityMaps(EquationSystems & es){
 
   for (const auto & elem : mesh.active_local_element_ptr_range()){
     for(unsigned int I=0; I<elem->n_nodes(); I++){
-      unsigned int nodeID = elem->node_id();
+      unsigned int nodeID = elem->node_id(I);
 
-      Node & node = mesh.node_ref(nodeID);
+      const Node & node = mesh.node_ref(nodeID);
       if( node.processor_id() == LProcID){
         if( elem->is_vertex(nodeID)   ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LVert, nodeID, LocalEntitySizes[0]);
         if( elem->is_edge(nodeID)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LEdge, nodeID, LocalEntitySizes[1]);
@@ -27,15 +27,15 @@ void SupplementaryEntityIDs::FormEntityMaps(EquationSystems & es){
   //and 
   std::vector<unsigned int> procEntitySizesGlobal;
   procEntitySizesGlobal.clear();
-  for(int I=0; <4*nprocs; I++) procEntitySizesGlobal.push_back(0);
+  for(int I=0; I<4*nprocs; I++) procEntitySizesGlobal.push_back(0);
 
 
   procEntitySizesGlobal[procID*4 + 0] = LocalEntitySizes[0];
   procEntitySizesGlobal[procID*4 + 1] = LocalEntitySizes[1];
   procEntitySizesGlobal[procID*4 + 2] = LocalEntitySizes[2];
   procEntitySizesGlobal[procID*4 + 3] = LocalEntitySizes[3];
-  MPI_Allreduce(&procEntitySizesGlobal.front(), &procEntitySizesGlobal.front(), &procEntitySizesGlobal.size()
-              , MPI_UNSIGNED, MPI_SUM, mesh.comm());
+  MPI_Allreduce(&procEntitySizesGlobal.front(), &procEntitySizesGlobal.front(), procEntitySizesGlobal.size()
+              , MPI_UNSIGNED, MPI_SUM, mesh.comm().get());
 
   if(procID != 0){
     for(int I=0; I<procID; I++){
