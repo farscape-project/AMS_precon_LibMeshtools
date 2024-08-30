@@ -42,7 +42,7 @@
 #include "solution_function.h"
 
 // The Hypre AMS solver
-
+#include "Hypre_AMS_Interface.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -75,7 +75,7 @@ int main (int argc, char ** argv)
   // for the Nedelec triangle or quadrilateral elements, respectively.
   std::string elem_str =
     command_line_value(std::string("element_type"),
-                       std::string("TRI6"));
+                       std::string("QUAD9"));
 
   libmesh_error_msg_if(elem_str != "TRI6" && elem_str != "TRI7" && elem_str != "QUAD8" && elem_str != "QUAD9",
                        "You selected: " << elem_str <<
@@ -121,7 +121,11 @@ int main (int argc, char ** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
+  Hypre_AMS_Interface hypre_ams(equation_systems);
+
+/*
   system.solve();
+
 
   ExactSolution exact_sol(equation_systems);
 
@@ -152,6 +156,7 @@ int main (int argc, char ** argv)
   libMesh::out << "HCurl-Error is: "
                << exact_sol.hcurl_error("CurlCurl", "u")
                << std::endl;
+*/
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 

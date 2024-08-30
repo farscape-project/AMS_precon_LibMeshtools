@@ -4,6 +4,7 @@
 #include <map>
 #include "libmesh/equation_systems.h"
 #include "libmesh/elem.h"
+#include <string>
 
 using namespace libMesh;
 
@@ -25,8 +26,10 @@ class SupplementaryEntityIDs
     //Template that increases the size of a map
 	//if the new entry is unique
     template<typename GlobalIterator, typename LocalIterator>
-    void AddToMapIteratorIfUnique(std::map<GlobalIterator,LocalIterator> EntityMap, GlobalIterator I, LocalIterator J){
+    void AddToMapIteratorIfUnique(std::map<GlobalIterator,LocalIterator> & EntityMap, GlobalIterator I, LocalIterator & J, Elem * element, std::string name){
       if( EntityMap.find(I) == EntityMap.end() ){
+        //if(name == "NODE")
+        // std::cout << name << " Element id " << element->id() << " EntityMap " << I << " Count J " << J << std::endl;
         EntityMap[I] = J;
         J++;
       }
