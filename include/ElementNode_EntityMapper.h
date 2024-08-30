@@ -18,7 +18,8 @@ class SupplementaryEntityIDs
     std::map<unsigned int, unsigned int> Global_to_LVolm;
     unsigned int LocalEntitySizes[4] = {0,0,0,0};
     unsigned int LocalEntityStarts[4] = {0,0,0,0};
-    int nprocs, procID;
+    processor_id_type nprocs{global_n_processors()};
+    processor_id_type procID{global_processor_id()};
 
 
     //Template that increases the size of a map

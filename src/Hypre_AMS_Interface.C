@@ -2,10 +2,6 @@
 
 //The class constructor
 Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es){
-  //if(is_parallel){
-    int ierr = MPI_Comm_rank(es.get_mesh().comm().get(), &_SupEiDs.procID);
-    ierr = MPI_Comm_size(es.get_mesh().comm().get(), &_SupEiDs.nprocs);
-  //}
   _SupEiDs.FormEntityMaps(es);
   Make_Edge_Map(es);
   //Set_Hypre_AMS_Interface();
