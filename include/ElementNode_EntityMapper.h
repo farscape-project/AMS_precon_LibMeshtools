@@ -28,8 +28,6 @@ class SupplementaryEntityIDs
     template<typename GlobalIterator, typename LocalIterator>
     void AddToMapIteratorIfUnique(std::map<GlobalIterator,LocalIterator> & EntityMap, GlobalIterator I, LocalIterator & J, Elem * element, std::string name){
       if( EntityMap.find(I) == EntityMap.end() ){
-        //if(name == "NODE")
-        // std::cout << name << " Element id " << element->id() << " EntityMap " << I << " Count J " << J << std::endl;
         EntityMap[I] = J;
         J++;
       }
