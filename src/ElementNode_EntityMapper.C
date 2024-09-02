@@ -57,11 +57,11 @@ void SupplementaryEntityIDs::FormEntityMaps(EquationSystems & es){
 
 bool SupplementaryEntityIDs::Is_LocalEdge(unsigned int nodeID){
   if( Global_to_LEdge.find(nodeID) == Global_to_LEdge.end() ) return false;
-  return false;
+  return true;
 }
 	
 int SupplementaryEntityIDs::EdgeLocalID(unsigned int nodeID){
-  if( Global_to_LEdge.find(nodeID) == Global_to_LEdge.end() ) return Global_to_LEdge[nodeID];
+  if( Global_to_LEdge.find(nodeID) != Global_to_LEdge.end() ) return Global_to_LEdge[nodeID];
   return -1;
 }
 
