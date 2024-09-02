@@ -9,18 +9,16 @@ void SupplementaryEntityIDs::FormEntityMaps(EquationSystems & es){
   //to a unique contiguous ID 
   unsigned int LProcID = mesh.processor_id();
 
-  std::cout << " LProcID " << mesh.processor_id() << " MyProcID " << procID << std::endl;
-
   for (const auto & elem : mesh.active_local_element_ptr_range()){
     for(unsigned int I=0; I<elem->n_nodes(); I++){
       unsigned int nodeID = elem->node_id(I);
 
       const Node & node = mesh.node_ref(nodeID);
       if( node.processor_id() == LProcID){
-        if( elem->is_vertex(I)   ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LVert, nodeID, LocalEntitySizes[0], elem, "NODE");
-        if( elem->is_edge(I)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LEdge, nodeID, LocalEntitySizes[1], elem, "EGDE");
-        if( elem->is_face(I)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LFace, nodeID, LocalEntitySizes[2], elem, "FACE");
-        if( elem->is_internal(I) ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LVolm, nodeID, LocalEntitySizes[3], elem, "INTERNAL");
+        if( elem->is_vertex(I)   ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LVert, nodeID, LocalEntitySizes[0]);
+        if( elem->is_edge(I)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LEdge, nodeID, LocalEntitySizes[1]);
+        if( elem->is_face(I)     ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LFace, nodeID, LocalEntitySizes[2]);
+        if( elem->is_internal(I) ) AddToMapIteratorIfUnique<unsigned int, unsigned int>(Global_to_LVolm, nodeID, LocalEntitySizes[3]);
       }
     }
   }

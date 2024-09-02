@@ -26,7 +26,7 @@ class SupplementaryEntityIDs
     //Template that increases the size of a map
 	//if the new entry is unique
     template<typename GlobalIterator, typename LocalIterator>
-    void AddToMapIteratorIfUnique(std::map<GlobalIterator,LocalIterator> & EntityMap, GlobalIterator I, LocalIterator & J, Elem * element, std::string name){
+    void AddToMapIteratorIfUnique(std::map<GlobalIterator,LocalIterator> & EntityMap, GlobalIterator I, LocalIterator & J){
       if( EntityMap.find(I) == EntityMap.end() ){
         EntityMap[I] = J;
         J++;
