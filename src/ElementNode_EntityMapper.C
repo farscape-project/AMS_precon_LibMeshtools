@@ -23,12 +23,9 @@ void SupplementaryEntityIDs::FormEntityMaps(EquationSystems & es){
     }
   }
 
-  //Find the entity sizes on each processor
-  //and 
-  // std::cout << "ONE LocalEntitySizes[0] " << LocalEntitySizes[0] << std::endl;
-
   std::vector<unsigned int> procEntitySizesGlobal, procRecvEntitySizesGlobal;
   procEntitySizesGlobal.clear();
+  procRecvEntitySizesGlobal.clear();
   for(int I=0; I<4*nprocs; I++) 
   {
   procEntitySizesGlobal.push_back(0);
@@ -51,6 +48,18 @@ void SupplementaryEntityIDs::FormEntityMaps(EquationSystems & es){
       LocalEntityStarts[3] += procRecvEntitySizesGlobal[I*4 + 3];
     }
   }
+  
+  total_num_rows = 0.0;
+  for(int I=0; I<nprocs; I++)
+      total_num_rows += procRecvEntitySizesGlobal[I*4 + 1];
+
+  local_num_rows = LocalEntitySizes[1];
+
+  total_num_cols = 0.0;
+  for(int I=0; I<nprocs; I++)
+      total_num_cols += procRecvEntitySizesGlobal[I*4 + 0];
+
+  local_num_cols = LocalEntitySizes[0];
 
 };
 
@@ -62,6 +71,11 @@ bool SupplementaryEntityIDs::Is_LocalEdge(unsigned int nodeID){
 	
 int SupplementaryEntityIDs::EdgeLocalID(unsigned int nodeID){
   if( Global_to_LEdge.find(nodeID) != Global_to_LEdge.end() ) return Global_to_LEdge[nodeID];
+  return -1;
+}
+
+int SupplementaryEntityIDs::VertexLocalID(unsigned int nodeID){
+  if( Global_to_LVert.find(nodeID) != Global_to_LVert.end() ) return Global_to_LVert[nodeID];
   return -1;
 }
 

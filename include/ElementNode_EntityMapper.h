@@ -22,7 +22,6 @@ class SupplementaryEntityIDs
     processor_id_type nprocs{global_n_processors()};
     processor_id_type procID{global_processor_id()};
 
-
     //Template that increases the size of a map
 	//if the new entry is unique
     template<typename GlobalIterator, typename LocalIterator>
@@ -45,5 +44,12 @@ class SupplementaryEntityIDs
 	//when given a valid global nodeID
 	//Otherwise returns a value of -1
     int EdgeLocalID(unsigned int nodeID);
+
+    int VertexLocalID(unsigned int nodeID);
+
+    int total_num_cols;
+    int local_num_cols;
+    int total_num_rows;
+    int local_num_rows;
 };
 #endif

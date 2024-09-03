@@ -84,7 +84,7 @@ class Hypre_AMS_Interface
     // interface
     void Set_G_Operator();
 
-    void Set_Hypre_AMS_Interface(EquationSystems & es, PC pc);
+    void Set_Hypre_AMS_Interface(EquationSystems & es);
 
   public:
     Hypre_AMS_Interface(EquationSystems & es);
