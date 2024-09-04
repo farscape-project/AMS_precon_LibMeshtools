@@ -69,7 +69,7 @@ class Hypre_AMS_Interface
     //into the Parallel CSR stored objects
     PetscErrorCode petscErr;     //PETSc error code
     PetscInt       ncols, nrows; //PETSc integers
-    Mat  par_G;                  //PETSc G-Operator CSR matrix
+    Mat  par_G;                  //PETSc G-Operator AIJ matrix
     Vec  par_xvec, par_yvec, par_zvec ;    //PETSc Edge unit vectors (CSR-vec)
 
   public:
@@ -79,6 +79,10 @@ class Hypre_AMS_Interface
   private:
     // Makes the edge map
     void Make_Edge_Map(EquationSystems & es);
+
+    // Allocate G-operator matrix using the Hypre/PETSc-hypre
+    // interface
+    void Allocate_G_Operator(EquationSystems & es);
 
     // Sets the G-operator matrix using the Hypre/PETSc-hypre
     // interface
