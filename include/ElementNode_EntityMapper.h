@@ -35,6 +35,9 @@ class SupplementaryEntityIDs
     //Form the entity Maps
     void FormEntityMaps(EquationSystems & es);
 
+    //Form the entity Maps
+    void FormVertexMaps(EquationSystems & es);
+
     //Checks whether the global nodeID provided
 	//corresponds to an edge that is owned by the
 	//local process
@@ -46,6 +49,8 @@ class SupplementaryEntityIDs
     int EdgeLocalID(unsigned int nodeID);
 
     int VertexLocalID(unsigned int nodeID);
+
+    std::map<unsigned int, unsigned int> GlobalVertexID_to_SeqID;
 
     int total_num_cols;
     int local_num_cols;

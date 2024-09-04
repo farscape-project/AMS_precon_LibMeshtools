@@ -3,6 +3,7 @@
 //The class constructor
 Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es){
   _SupEiDs.FormEntityMaps(es);
+  _SupEiDs.FormVertexMaps(es);
   Allocate_G_Operator(es);
   Make_Edge_Map(es);
   Set_Hypre_AMS_Interface(es);
@@ -20,8 +21,6 @@ void Hypre_AMS_Interface::Allocate_G_Operator(EquationSystems & es)
   PetscInt d_nz = 2;
   PetscInt o_nz = 2;
   petscErr = MatMPIAIJSetPreallocation(par_G, d_nz, NULL, o_nz, NULL);
-  //petscErr = MatSetOption(par_G, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-
 }
 
 
@@ -55,24 +54,18 @@ void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es)
         if(sign > 0) {first_index = m; second_index = n;} else {first_index = n; second_index = m;}
         //std::vector<PetscInt> row_index{EdgeLocalID+_SupEiDs.LocalEntityStarts[1]};
         std::vector<PetscInt> row_index{EdgeRef.dof_number(0,0,0)};
-        first_col_index = _SupEiDs.VertexLocalID(first_index)+_SupEiDs.LocalEntityStarts[0];
-        second_col_index = _SupEiDs.VertexLocalID(second_index)+_SupEiDs.LocalEntityStarts[0];
+        first_col_index = _SupEiDs.GlobalVertexID_to_SeqID[first_index];
+        second_col_index = _SupEiDs.GlobalVertexID_to_SeqID[second_index];
         std::vector<PetscInt> col_index{first_col_index , second_col_index};
         MatSetValues(par_G,  1, row_index.data(),  2, col_index.data(), vals.data(), INSERT_VALUES);
-        std::pair<unsigned int, unsigned int> edge_EndPair;
-        edge_EndPair = std::make_pair(m,n);
-        edge_map[EdgeLocalID] = edge_EndPair;
       }
     }
   }
 
-
-  ntot_edges_local = edge_map.size();  
-
   petscErr = MatAssemblyBegin(par_G, MAT_FINAL_ASSEMBLY);
   petscErr = MatAssemblyEnd(par_G, MAT_FINAL_ASSEMBLY); 
  
-  MatView(par_G, PETSC_VIEWER_STDOUT_WORLD);
+  //MatView(par_G, PETSC_VIEWER_STDOUT_WORLD);
 }
 
 
@@ -85,33 +78,33 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
   //coordinates at vertices (PETSc Vector)
   Vec  par_xcoord, par_ycoord, par_zcoord; 
-  petscErr = VecCreate(mesh.comm().get(),&par_xcoord);
-  petscErr = VecCreate(mesh.comm().get(),&par_ycoord);
-  petscErr = VecCreate(mesh.comm().get(),&par_zcoord);
-
-  //Set the coordinate vector sizes and paritions
-  int CoordsSize = _SupEiDs.Global_to_LVert.size();
-  petscErr = VecSetSizes(par_xcoord,PETSC_DECIDE,CoordsSize);
-  petscErr = VecSetFromOptions(par_xcoord);
-  petscErr = VecDuplicate(par_xcoord,&par_ycoord);
-  petscErr = VecDuplicate(par_xcoord,&par_zcoord);
-
-  //Setting the vector-coordinate Values
-  PetscInt istart,iend;
-  VecGetOwnershipRange(par_xcoord,&istart,&iend);
-  auto it = _SupEiDs.Global_to_LVert.begin();
-  for(PetscInt I=istart; I<iend; I++){
+  petscErr = VecCreateMPI(mesh.comm().get(),_SupEiDs.local_num_cols,_SupEiDs.total_num_cols,&par_xcoord);
+  petscErr = VecCreateMPI(mesh.comm().get(),_SupEiDs.local_num_cols,_SupEiDs.total_num_cols,&par_ycoord);
+  petscErr = VecCreateMPI(mesh.comm().get(),_SupEiDs.local_num_cols,_SupEiDs.total_num_cols,&par_zcoord);
+ 
+  for(auto it = _SupEiDs.Global_to_LVert.begin(); it != _SupEiDs.Global_to_LVert.end(); it++){
     int nodeID = it->first;
-	  const Node & node = mesh.node_ref(nodeID);
+    const Node & node = mesh.node_ref(nodeID);
     PetscScalar x = (PetscScalar)( node(0) );
     PetscScalar y = (PetscScalar)( node(1) );
     PetscScalar z = (PetscScalar)( node(2) );
-   // std::cout << I << " " << x << " " << y << std::endl;
+    int localID = it->second;
+    PetscInt I = _SupEiDs.LocalEntityStarts[0]+localID;
     VecSetValues(par_xcoord,1,&I,&x,INSERT_VALUES);
     VecSetValues(par_ycoord,1,&I,&y,INSERT_VALUES);
     VecSetValues(par_zcoord,1,&I,&z,INSERT_VALUES);
-	it++;
   }
+
+  petscErr = VecAssemblyBegin(par_xcoord); 
+  petscErr = VecAssemblyEnd(par_xcoord); 
+
+  petscErr = VecAssemblyBegin(par_ycoord); 
+  petscErr = VecAssemblyEnd(par_ycoord); 
+
+  petscErr = VecAssemblyBegin(par_zcoord); 
+  petscErr = VecAssemblyEnd(par_zcoord); 
+
+  //VecView(par_xcoord, PETSC_VIEWER_STDOUT_WORLD);
 
 
 /*

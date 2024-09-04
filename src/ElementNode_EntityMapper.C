@@ -79,3 +79,28 @@ int SupplementaryEntityIDs::VertexLocalID(unsigned int nodeID){
   return -1;
 }
 
+
+
+
+void SupplementaryEntityIDs::FormVertexMaps(EquationSystems & es){
+  // Get a constant reference to the mesh object.
+  const MeshBase & mesh = es.get_mesh();
+
+  std::vector<unsigned int> procVertexGlobalKey(total_num_cols,0);
+  std::vector<unsigned int> procRecvVertexGlobalKey(total_num_cols,0);
+
+  for(auto it = Global_to_LVert.begin(); it != Global_to_LVert.end(); it++){
+    int nodeID = it->first;
+    int localID = it->second;
+	  const Node & node = mesh.node_ref(nodeID);
+    procVertexGlobalKey[LocalEntityStarts[0]+localID] = nodeID;
+  }
+  
+  MPI_Allreduce(&procVertexGlobalKey.front(), &procRecvVertexGlobalKey.front(), total_num_cols
+              , MPI_UNSIGNED, MPI_SUM, mesh.comm().get());
+
+  for(int i=0; i < total_num_cols; i++)
+      GlobalVertexID_to_SeqID[procRecvVertexGlobalKey[i]] = i;
+
+}
+
