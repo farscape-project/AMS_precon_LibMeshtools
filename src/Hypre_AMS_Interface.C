@@ -21,6 +21,7 @@ void Hypre_AMS_Interface::Allocate_G_Operator(EquationSystems & es)
   PetscInt d_nz = 2;
   PetscInt o_nz = 2;
   petscErr = MatMPIAIJSetPreallocation(par_G, d_nz, NULL, o_nz, NULL);
+
 }
 
 
@@ -79,8 +80,12 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   //coordinates at vertices (PETSc Vector)
   Vec  par_xcoord, par_ycoord, par_zcoord; 
   petscErr = VecCreateMPI(mesh.comm().get(),_SupEiDs.local_num_cols,_SupEiDs.total_num_cols,&par_xcoord);
-  petscErr = VecCreateMPI(mesh.comm().get(),_SupEiDs.local_num_cols,_SupEiDs.total_num_cols,&par_ycoord);
-  petscErr = VecCreateMPI(mesh.comm().get(),_SupEiDs.local_num_cols,_SupEiDs.total_num_cols,&par_zcoord);
+  petscErr = VecDuplicate(par_xcoord,&par_ycoord);
+  petscErr = VecDuplicate(par_xcoord,&par_zcoord);
+  petscErr = VecCreateMPI(mesh.comm().get(),_SupEiDs.local_num_rows,_SupEiDs.total_num_rows,&par_xvec);
+  petscErr = VecDuplicate(par_xvec,&par_yvec);
+  petscErr = VecDuplicate(par_xvec,&par_zvec);
+
  
   for(auto it = _SupEiDs.Global_to_LVert.begin(); it != _SupEiDs.Global_to_LVert.end(); it++){
     int nodeID = it->first;
@@ -106,19 +111,18 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
   //VecView(par_xcoord, PETSC_VIEWER_STDOUT_WORLD);
 
-
-/*
-
-  //Set the G-Operator matrix
-  //petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
-
-
   //Multiply the G-operator by the coordinates
   //to get the edge vectors
   petscErr = MatMult(par_G, par_xcoord, par_xvec);
   petscErr = MatMult(par_G, par_ycoord, par_yvec);
   petscErr = MatMult(par_G, par_zcoord, par_zvec);
 
+  //VecView(par_xvec, PETSC_VIEWER_STDOUT_WORLD);
+
+/*
+
+  //Set the G-Operator matrix
+  //petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
 
   //Set the G-operator matrix
   //petscErr = PCHYPRESetEdgeConstantVectors(pc, par_xvec, par_yvec, par_zvec);
