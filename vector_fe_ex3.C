@@ -38,8 +38,10 @@
 // The systems and solvers we may use
 #include "curl_curl_system.h"
 #include "libmesh/diff_solver.h"
+#include "libmesh/newton_solver.h"
 #include "libmesh/steady_solver.h"
 #include "solution_function.h"
+#include "libmesh/petsc_linear_solver.h"
 
 // The Hypre AMS solver
 #include "Hypre_AMS_Interface.h"
@@ -123,9 +125,17 @@ int main (int argc, char ** argv)
 
   Hypre_AMS_Interface hypre_ams(equation_systems);
 
-/*
-  system.solve();
+  NewtonSolver & newton = cast_ref<NewtonSolver &>(solver);
+  const PC & pc = cast_ref<PetscLinearSolver<double> &>(newton.get_linear_solver()).pc();
 
+
+  //petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
+
+  // Set vertex coordinates
+  //petscErr = PCHYPRESetEdgeConstantVectors(pc, par_xvec, par_yvec, par_zvec);
+
+  system.solve();
+/*
 
   ExactSolution exact_sol(equation_systems);
 
