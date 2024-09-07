@@ -1,5 +1,5 @@
 # The coarse grid size from which to start adaptivity
-grid_size = 4
+grid_size = 10
 
 # Turn this off to see the NewtonSolver chatter
 solver_quiet = false 

@@ -123,19 +123,14 @@ int main (int argc, char ** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
-  Hypre_AMS_Interface hypre_ams(equation_systems);
 
   NewtonSolver & newton = cast_ref<NewtonSolver &>(solver);
   const PC & pc = cast_ref<PetscLinearSolver<double> &>(newton.get_linear_solver()).pc();
 
-
-  //petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
-
-  // Set vertex coordinates
-  //petscErr = PCHYPRESetEdgeConstantVectors(pc, par_xvec, par_yvec, par_zvec);
+  Hypre_AMS_Interface hypre_ams(equation_systems, pc);
 
   system.solve();
-/*
+
 
   ExactSolution exact_sol(equation_systems);
 
@@ -166,7 +161,7 @@ int main (int argc, char ** argv)
   libMesh::out << "HCurl-Error is: "
                << exact_sol.hcurl_error("CurlCurl", "u")
                << std::endl;
-*/
+
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 

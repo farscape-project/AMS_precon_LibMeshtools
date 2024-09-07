@@ -1,7 +1,7 @@
 #include "Hypre_AMS_Interface.h"
 
 //The class constructor
-Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es){
+Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es, const PC & pc): pc(pc) {
   _SupEiDs.FormEntityMaps(es);
   _SupEiDs.FormVertexMaps(es);
   Allocate_G_Operator(es);
@@ -119,19 +119,21 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
   //VecView(par_xvec, PETSC_VIEWER_STDOUT_WORLD);
 
-/*
 
-  //Set the G-Operator matrix
-  //petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
+  // Set discrete gradient 
+  petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
 
-  //Set the G-operator matrix
-  //petscErr = PCHYPRESetEdgeConstantVectors(pc, par_xvec, par_yvec, par_zvec);
-
+  // Set vertex coordinates
+  petscErr = PCHYPRESetEdgeConstantVectors(pc, par_xvec, par_yvec, par_zvec);
 
   //Clean-up the extra arrays
-  int ierr = VecDestroy(&par_xcoord);
-  ierr = VecDestroy(&par_ycoord);
-  ierr = VecDestroy(&par_zcoord);
-  //delete[] ncols, rows, cols, Matvalues, Vecvalues;
-  */
+  
+  petscErr = VecDestroy(&par_xcoord);
+  petscErr = VecDestroy(&par_ycoord);
+  petscErr= VecDestroy(&par_zcoord);
+  petscErr = VecDestroy(&par_xvec);
+  petscErr = VecDestroy(&par_xvec);
+  petscErr= VecDestroy(&par_xvec);
+  petscErr = MatDestroy(&par_G);
+  
 };
