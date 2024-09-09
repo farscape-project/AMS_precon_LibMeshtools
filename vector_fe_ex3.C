@@ -126,8 +126,9 @@ int main (int argc, char ** argv)
 
   NewtonSolver & newton = cast_ref<NewtonSolver &>(solver);
   const PC & pc = cast_ref<PetscLinearSolver<double> &>(newton.get_linear_solver()).pc();
+  const KSP & ksp = cast_ref<PetscLinearSolver<double> &>(newton.get_linear_solver()).ksp();
 
-  Hypre_AMS_Interface hypre_ams(equation_systems, pc);
+  Hypre_AMS_Interface hypre_ams(equation_systems, pc, ksp);
 
   system.solve();
 

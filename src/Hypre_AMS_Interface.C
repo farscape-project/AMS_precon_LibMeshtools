@@ -1,7 +1,7 @@
 #include "Hypre_AMS_Interface.h"
 
 //The class constructor
-Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es, const PC & pc): pc(pc) {
+Hypre_AMS_Interface::Hypre_AMS_Interface(EquationSystems & es, const PC & pc, const KSP & ksp): pc(pc), ksp(ksp) {
   _SupEiDs.FormEntityMaps(es);
   _SupEiDs.FormVertexMaps(es);
   Allocate_G_Operator(es);
@@ -119,8 +119,6 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
   //VecView(par_xvec, PETSC_VIEWER_STDOUT_WORLD);
 
-
-  KSPCreate(mesh.comm().get(), &ksp);
   petscErr = PetscOptionsSetValue(NULL,"-ksp_type", "gmres"); 
   petscErr = PetscOptionsSetValue(NULL,"-pc_type", "hypre");
   petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_type", "ams");
@@ -133,9 +131,6 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   petscErr = PetscOptionsSetValue(NULL, "-ksp_converged_reason", NULL);
   petscErr = PetscOptionsSetValue(NULL, "-options_left", NULL);
   petscErr = KSPSetFromOptions(ksp); 
-
-  // Set pc type
-  petscErr = PCSetType(pc, "hypre");
 
   // Set discrete gradient 
   petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
