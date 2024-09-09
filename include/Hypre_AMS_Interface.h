@@ -72,6 +72,7 @@ class Hypre_AMS_Interface
     Mat  par_G;                  //PETSc G-Operator AIJ matrix
     Vec  par_xvec, par_yvec, par_zvec ;    //PETSc Edge unit vectors (CSR-vec)
     const PC & pc;
+    KSP           ksp;
 
   public:
     unsigned int ilower, iupper; //Edge lower and upper bounds

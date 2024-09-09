@@ -120,11 +120,33 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   //VecView(par_xvec, PETSC_VIEWER_STDOUT_WORLD);
 
 
+  KSPCreate(mesh.comm().get(), &ksp);
+  petscErr = PetscOptionsSetValue(NULL,"-ksp_type", "gmres"); 
+  petscErr = PetscOptionsSetValue(NULL,"-pc_type", "hypre");
+  petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_type", "ams");
+  petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_ams_relax_type", "2");
+  petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_ams_relax_times", "1");
+  petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_ams_relax_weight", "1.0");
+  petscErr = PetscOptionsSetValue(NULL, "-pc_hypre_ams_omega", "1.0");
+  petscErr = PetscOptionsSetValue(NULL, "-ksp_view", NULL);
+  petscErr = PetscOptionsSetValue(NULL, "-ksp_monitor_true_residual", NULL);
+  petscErr = PetscOptionsSetValue(NULL, "-ksp_converged_reason", NULL);
+  petscErr = PetscOptionsSetValue(NULL, "-options_left", NULL);
+  petscErr = KSPSetFromOptions(ksp); 
+
+  // Set pc type
+  petscErr = PCSetType(pc, "hypre");
+
   // Set discrete gradient 
   petscErr = PCHYPRESetDiscreteGradient(pc, par_G);
 
   // Set vertex coordinates
   petscErr = PCHYPRESetEdgeConstantVectors(pc, par_xvec, par_yvec, par_zvec);
+
+
+ //./example-dbg -ksp_type gmres -pc_type hypre -pc_hypre_type ams -pc_hypre_ams_relax_type 2 -pc_hypre_ams_relax_times 1 -pc_hypre_ams_relax_weight 1.0 -pc_hypre_ams_omega 1.0 -ksp_view -ksp_monitor -options_left
+  //./example-dbg -ksp_type gmres -pc_type hypre -ksp_view -ksp_monitor -options_left
+
 
   //Clean-up the extra arrays
   
