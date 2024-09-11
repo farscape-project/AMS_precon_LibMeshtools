@@ -126,6 +126,8 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
   petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_ams_relax_times", "1");
   petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_ams_relax_weight", "1.0");
   petscErr = PetscOptionsSetValue(NULL, "-pc_hypre_ams_omega", "1.0");
+  petscErr = PetscOptionsSetValue(NULL, "-pc_hypre_ams_amg_alpha_options", "10,1,8,6,4");
+  petscErr = PetscOptionsSetValue(NULL, "-pc_hypre_ams_amg_beta_options", "10,1,8,6,4");
   petscErr = PetscOptionsSetValue(NULL, "-ksp_view", NULL);
   petscErr = PetscOptionsSetValue(NULL, "-ksp_monitor_true_residual", NULL);
   petscErr = PetscOptionsSetValue(NULL, "-ksp_converged_reason", NULL);
