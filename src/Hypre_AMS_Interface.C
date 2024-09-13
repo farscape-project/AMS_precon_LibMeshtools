@@ -51,8 +51,7 @@ void Hypre_AMS_Interface::Make_Edge_Map(EquationSystems & es)
         unsigned int n = elem->node_id(elem->local_edge_node(I, 1));
         const Node & node_m = mesh.node_ref(m);
         const Node & node_n = mesh.node_ref(n);
-        const short sign = node_m > node_n ? 1 : -1;
-        if(sign > 0) {first_index = m; second_index = n;} else {first_index = n; second_index = m;}
+        if(node_m > node_n) {first_index = m; second_index = n;} else {first_index = n; second_index = m;}
         //std::vector<PetscInt> row_index{EdgeLocalID+_SupEiDs.LocalEntityStarts[1]};
         std::vector<PetscInt> row_index{EdgeRef.dof_number(0,0,0)};
         first_col_index = _SupEiDs.GlobalVertexID_to_SeqID[first_index];
