@@ -124,9 +124,11 @@ int main (int argc, char ** argv)
   equation_systems.print_info();
 
 
-  NewtonSolver & newton = cast_ref<NewtonSolver &>(solver);
-  const PC & pc = cast_ref<PetscLinearSolver<double> &>(newton.get_linear_solver()).pc();
-  const KSP & ksp = cast_ref<PetscLinearSolver<double> &>(newton.get_linear_solver()).ksp();
+  NewtonSolver & newton = dynamic_cast<NewtonSolver &>(solver);
+  PC pc;
+  const KSP & ksp = dynamic_cast<PetscLinearSolver<double> &>(newton.get_linear_solver()).ksp();
+
+  KSPGetPC(ksp, &pc);
 
   Hypre_AMS_Interface hypre_ams(equation_systems, pc, ksp);
 
