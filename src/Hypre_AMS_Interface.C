@@ -119,7 +119,7 @@ void Hypre_AMS_Interface::Set_Hypre_AMS_Interface(EquationSystems & es){
 
   //VecView(par_xvec, PETSC_VIEWER_STDOUT_WORLD);
 
-  petscErr = PetscOptionsSetValue(NULL,"-ksp_type", "gmres"); 
+  petscErr = PetscOptionsSetValue(NULL,"-ksp_type", "fgmres"); 
   petscErr = PetscOptionsSetValue(NULL,"-pc_type", "hypre");
   petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_type", "ams");
   petscErr = PetscOptionsSetValue(NULL,"-pc_hypre_ams_relax_type", "2");
